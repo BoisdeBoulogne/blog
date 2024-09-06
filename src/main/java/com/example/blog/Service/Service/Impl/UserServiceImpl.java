@@ -28,8 +28,10 @@ public class UserServiceImpl implements UserService {
         //比对账号，密码
         //jwt来验证
         Map<String,Object> claims = new HashMap<>();
-        claims.put("account", user.getAccount());//Jwt使用账号来标明是哪个用户
+        claims.put("userId", user.getId());//Jwt使用账号来标明是哪个用户
         String token = jwtToken.createToken(claims);
         return Result.success(token);
     }
+
+
 }
