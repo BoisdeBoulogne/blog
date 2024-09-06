@@ -37,8 +37,9 @@ public class ArticleController {
         return Result.success();
     }
 
-    @PutMapping("/update")
-    public Result<String> update(@RequestBody Article article) {
+    @PutMapping("/update/{id}")
+    public Result<String> update(@RequestBody Article article, @PathVariable Long id) {
+        article.setId(id);
         articleService.update(article);
         return Result.success();
     }

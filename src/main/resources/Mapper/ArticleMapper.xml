@@ -11,9 +11,10 @@
         select id,title from articles where user_id = #{userId}
     </select>
     <update id="update">
+        update articles
         <set>
             <if test="title != null and title != ''">
-                title = #{title},
+                articles_title = #{title},
             </if>
             <if test="updateTime != null">
                 update_time = #{updateTime},
@@ -27,4 +28,5 @@
         </set>
         where id = #{id}
     </update>
+
 </mapper>
