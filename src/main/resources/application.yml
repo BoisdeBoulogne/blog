@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: blog
+  datasource:
+    username: root
+    password: xujiaxing@413
+    url: jdbc:mysql://47.121.29.138:3306/blog
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath:/mappers/**/*.xml
