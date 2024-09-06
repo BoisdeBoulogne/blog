@@ -10,4 +10,21 @@
     <select id="getUsefulById" resultType="com.example.blog.Pojo.vo.ArticleVo">
         select id,title from articles where user_id = #{userId}
     </select>
+    <update id="update">
+        <set>
+            <if test="title != null and title != ''">
+                title = #{title},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="content != null">
+                content = #{content},
+            </if>
+            <if test="views != null">
+                views = #{views}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
 </mapper>

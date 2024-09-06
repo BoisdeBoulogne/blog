@@ -11,4 +11,8 @@ public interface ArticleService {
     Result<String> save(ArticleSaveDTO articleSaveDTO);
 
     Result<PageResult> getUsefulById(Integer page);
+
+    void delete(Integer id);
+
+    void update(Article article);
 }

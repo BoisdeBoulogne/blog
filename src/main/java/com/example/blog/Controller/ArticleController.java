@@ -30,4 +30,16 @@ public class ArticleController {
     public Result<PageResult> deleteOrUpdatePage(@PathVariable Integer page) {
         return articleService.getUsefulById(page);
     }
+
+    @DeleteMapping("/delete/{id}")
+    public Result<String> delete(@PathVariable Integer id) {
+        articleService.delete(id);
+        return Result.success();
+    }
+
+    @PutMapping("/update")
+    public Result<String> update(@RequestBody Article article) {
+        articleService.update(article);
+        return Result.success();
+    }
 }

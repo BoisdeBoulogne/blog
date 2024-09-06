@@ -54,4 +54,15 @@ public class ArticleServiceImpl implements ArticleService {
         pageResult.setList(page.getResult());
         return Result.success(pageResult);
     }
+
+    @Override
+    public void delete(Integer id) {
+        articleMapper.deleteById(id);
+    }
+
+    @Override
+    public void update(Article article) {
+        article.setUpdateTime(LocalDateTime.now());
+        articleMapper.update(article);
+    }
 }
