@@ -26,4 +26,7 @@ public interface UserMapper {
 
     @Update("update user set follower_count = following_count+1 where id = #{targetId}")
     void targetAdd(Long targetId);
+
+    @Select("select nickname from user where id = #{userId}")
+    String getNickNameById(Long userId);
 }

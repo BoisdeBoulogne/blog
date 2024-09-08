@@ -5,6 +5,7 @@ import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.dto.ArticleSaveDTO;
 import com.example.blog.Pojo.entity.Article;
 import com.example.blog.Pojo.entity.Tag;
+import com.example.blog.Pojo.vo.ArticleVo;
 import com.example.blog.Service.ArticleService;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public class ArticleController {
     private ArticleService articleService;
 
     @GetMapping("/{id}")
-    public Result<Article> getArticle(@PathVariable Integer id) {
+    public Result<ArticleVo> getArticle(@PathVariable Long id) {
         return articleService.getById(id);
     }
 
@@ -35,15 +36,15 @@ public class ArticleController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public Result<String> delete(@PathVariable Integer id) {
+    public Result<String> delete(@PathVariable Long id) {
         articleService.delete(id);
         return Result.success();
     }
 
     @PutMapping("/update/{id}")
-    public Result<String> update(@RequestBody Article article, @PathVariable Long id) {
-        article.setId(id);
-        articleService.update(article);
+    public Result<String> update(@RequestBody ArticleSaveDTO article, @PathVariable Long id) {
+
+        articleService.updateWithId(article,id);
         return Result.success();
     }
 

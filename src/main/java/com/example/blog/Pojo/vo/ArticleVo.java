@@ -2,8 +2,16 @@ package com.example.blog.Pojo.vo;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Data
 public class ArticleVo {
-    private Integer id;
     private String title;
+    private String content;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
+    private String author;
+    private List<String> tagsName;
+    private Integer views;
 }

@@ -4,11 +4,11 @@
 
 <mapper namespace="com.example.blog.Mapper.ArticleMapper">
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO articles (user_id, create_time, update_time, views, content, title)
-        VALUES (#{userId}, #{createTime}, #{updateTime}, #{views}, #{content}, #{title})
+        INSERT INTO articles (user_id, create_time, update_time, views, content, title,author )
+        VALUES (#{userId}, #{createTime}, #{updateTime}, #{views}, #{content}, #{title},#{author})
     </insert>
-    <select id="getUsefulById" resultType="com.example.blog.Pojo.vo.ArticleVo">
-        select id,title from articles where user_id = #{userId}
+    <select id="getUsefulById" resultType="com.example.blog.Pojo.entity.Article">
+        select * from articles where user_id = #{userId}
     </select>
     <update id="update">
         update articles

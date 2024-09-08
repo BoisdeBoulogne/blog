@@ -1,8 +1,6 @@
 package com.example.blog.Service.Service.Impl;
 
-import com.example.blog.Mapper.ArticleMapper;
-import com.example.blog.Mapper.Tag2ArticlesMapper;
-import com.example.blog.Mapper.TagMapper;
+import com.example.blog.Mapper.*;
 import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.dto.ArticleSaveDTO;
@@ -30,13 +28,37 @@ public class ArticleServiceImpl implements ArticleService {
     private TagMapper tagMapper;
     @Autowired
     private Tag2ArticlesMapper tag2ArticlesMapper;
+    @Autowired
+    private HistoryMapper historyMapper;
+    @Autowired
+    private UserMapper userMapper;
     @Override
-    public Result<Article> getById(Integer id) {
-        Article article = articleMapper.getById(id);
+    public Result<ArticleVo> getById(Long id) {
+        Article article = articleMapper.getById(id);//获取文章详情
+        article.setViews(article.getViews() + 1);
         if (article == null) {
             return Result.error("不存在的文章");
         }
-        return Result.success(article);
+        ThreadInfo.setThread(10L);
+        Long userId = ThreadInfo.getThread();//获取当前用户ID
+        if (userId != null) {
+            //todo 历史去重
+            historyMapper.insert(id,userId);
+        }
+        //todo 浏览次数加上
+        articleMapper.update(article);
+
+        List<Long> tagIds = tag2ArticlesMapper.getByArticleId(id);
+        List<String> tagNames = new ArrayList<>();
+        for (Long tagId : tagIds) {
+            String tagName = tagMapper.getNameById(tagId);
+            tagNames.add(tagName);
+        }
+
+        ArticleVo articleVo = new ArticleVo();
+        BeanUtils.copyProperties(article, articleVo);
+        articleVo.setTagsName(tagNames);
+        return Result.success(articleVo);
     }
 
     @Override
@@ -46,29 +68,46 @@ public class ArticleServiceImpl implements ArticleService {
         article.setCreateTime(LocalDateTime.now());
         article.setUpdateTime(LocalDateTime.now());
         article.setViews(0);
-        //TODO 后续使用LocalThread
-        article.setUserId(10L);
+        Long userId = ThreadInfo.getThread();
+        article.setUserId(userId);
+        String author = userMapper.getNickNameById(userId);
+        article.setAuthor(author);
         articleMapper.save(article);
         Long articleId = article.getId();
-        Long tagId = articleSaveDTO.getTagId();
-        tag2ArticlesMapper.insert(articleId,tagId);
+        List<Long> tagIds = articleSaveDTO.getTagIds();
+        for (Long tagId : tagIds) {
+            tag2ArticlesMapper.insert(articleId,tagId); //tag和article映射表
+        }
         return Result.success();
     }
-
     @Override
     public Result<PageResult> getUsefulById(Integer pageNum) {
         PageHelper.startPage(pageNum, OtherConstants.pageSize);
         // todo threadlocal
         Long userId = 1L;
-        Page<ArticleVo> page = articleMapper.getUsefulById(userId);
-        PageResult pageResult = new PageResult();
-        pageResult.setTotal(page.getPages());
-        pageResult.setList(page.getResult());
+        Page<Article> page = articleMapper.getUsefulById(userId);
+        List<Article> articles = page.getResult();
+        List<ArticleVo> articleVos = new ArrayList<>();
+        for (Article article : articles) {
+            ArticleVo articleVo = new ArticleVo();
+            BeanUtils.copyProperties(article, articleVo);
+            articleVos.add(articleVo);
+            List<Long> tagIds = tag2ArticlesMapper.getTagsIdByArticleId(article.getId());
+            List<String> tagsNames = new ArrayList<>();
+            for (Long tagId : tagIds) {
+                String tagName= tagMapper.getNameById(tagId);
+                tagsNames.add(tagName);
+            }
+            articleVo.setTagsName(tagsNames);
+        }
+        PageResult<ArticleVo> pageResult = new PageResult<ArticleVo>();
+        pageResult.setTotal(articles.size());
+        pageResult.setList(articleVos);
         return Result.success(pageResult);
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(Long id) {
         articleMapper.deleteById(id);
     }
 
@@ -87,5 +126,23 @@ public class ArticleServiceImpl implements ArticleService {
             tagList.add(tag);
         }
         return tagList;
+    }
+
+    @Override
+    public void updateWithId(ArticleSaveDTO article, Long id) {
+        Article article1 = articleMapper.getById(id);
+        article1.setUpdateTime(LocalDateTime.now());
+        article1.setContent(article.getContent());
+        article1.setTitle(article.getTitle());//三个更新字段
+        List<Long> tags = article.getTagIds();
+        if (tags != null) {
+            tag2ArticlesMapper.deleteByArticleId(id);
+            for (Long tagId : tags) {
+                tag2ArticlesMapper.insert(id,tagId);
+            }
+        }
+
+        BeanUtils.copyProperties(article, article1);
+        articleMapper.update(article1);
     }
 }

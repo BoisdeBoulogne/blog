@@ -13,4 +13,5 @@ public class Article {
     private Integer views;
     private Long userId;
     private String content;
+    private String author;
 }

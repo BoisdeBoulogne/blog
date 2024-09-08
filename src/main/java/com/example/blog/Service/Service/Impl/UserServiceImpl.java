@@ -1,17 +1,19 @@
 package com.example.blog.Service.Service.Impl;
-
+import com.example.blog.Mapper.ArticleMapper;
 import com.example.blog.Mapper.FollowMapper;
+import com.example.blog.Mapper.HistoryMapper;
 import com.example.blog.Mapper.UserMapper;
 import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.dto.UserLoginDTO;
+import com.example.blog.Pojo.entity.Article;
 import com.example.blog.Pojo.entity.User;
+import com.example.blog.Pojo.vo.ArticleVo;
 import com.example.blog.Pojo.vo.UserVo;
 import com.example.blog.Service.UserService;
 import com.example.blog.constants.OtherConstants;
 import com.example.blog.utils.JwtToken;
 import com.example.blog.utils.ThreadInfo;
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +28,15 @@ import java.util.Map;
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
     @Autowired
-    FollowMapper followMapper;
+    private FollowMapper followMapper;
     @Autowired
     private JwtToken jwtToken;
+    @Autowired
+    private HistoryMapper historyMapper;
+    @Autowired
+    private ArticleMapper articleMapper;
     @Override
     public Result<String> login(UserLoginDTO userLogin) {
 
@@ -63,7 +69,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageResult getMyFans(int pageNum) {
+    public PageResult<UserVo> getMyFans(int pageNum) {
 
         PageHelper.startPage(pageNum,OtherConstants.pageSize);
         ThreadInfo.setThread(3L);
@@ -80,5 +86,16 @@ public class UserServiceImpl implements UserService {
         return pageResult;
     }
 
-
+    @Override
+    public PageResult<ArticleVo> getHistory(int pageNum) {
+        //todo
+        PageHelper.startPage(pageNum,OtherConstants.pageSize);
+        Long currId = ThreadInfo.getThread();
+        List<Long> articleIds = historyMapper.getArticleIdsByUserId(currId);
+        List<ArticleVo> articles = new ArrayList<>();
+        for (Long id : articleIds){
+            Article article = articleMapper.getById(id);
+        }
+        return null;
+    }
 }

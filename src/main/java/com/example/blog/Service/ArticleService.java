@@ -5,19 +5,22 @@ import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.dto.ArticleSaveDTO;
 import com.example.blog.Pojo.entity.Article;
 import com.example.blog.Pojo.entity.Tag;
+import com.example.blog.Pojo.vo.ArticleVo;
 
 import java.util.List;
 
 public interface ArticleService {
-    Result<Article> getById(Integer id);
+    Result<ArticleVo> getById(Long id);
 
     Result<String> save(ArticleSaveDTO articleSaveDTO);
 
     Result<PageResult> getUsefulById(Integer page);
 
-    void delete(Integer id);
+    void delete(Long id);
 
     void update(Article article);
 
     List<Tag> getArticleTags(Long articleId);
+
+    void updateWithId(ArticleSaveDTO article, Long id);
 }
