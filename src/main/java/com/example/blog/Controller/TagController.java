@@ -22,4 +22,6 @@ public class TagController {
         List<Tag> tags = tagService.getAllTags();
         return Result.success(tags);
     }
+
+
 }

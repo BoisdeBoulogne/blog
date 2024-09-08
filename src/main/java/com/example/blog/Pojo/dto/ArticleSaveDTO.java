@@ -6,4 +6,5 @@ import lombok.Data;
 public class ArticleSaveDTO {
     private String title;
     private String content;
+    private Long tagId;
 }
