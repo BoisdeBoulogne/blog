@@ -2,6 +2,7 @@ package com.example.blog.Service;
 
 import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
+import com.example.blog.Pojo.dto.CommentDTO;
 import com.example.blog.Pojo.dto.UserLoginDTO;
 import com.example.blog.Pojo.vo.ArticleVoForPre;
 import com.example.blog.Pojo.vo.UserVo;
@@ -27,4 +28,6 @@ public interface UserService {
     PageResult<UserVo> getMyLeaders(int pageNum);
 
     Result<String> removeCollect(Long articleId);
+
+    void comment(CommentDTO commentDTO);
 }

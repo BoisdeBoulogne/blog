@@ -2,11 +2,13 @@ package com.example.blog.Controller;
 
 import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
+import com.example.blog.Pojo.dto.CommentDTO;
 import com.example.blog.Pojo.dto.UserLoginDTO;
 
 import com.example.blog.Pojo.vo.ArticleVoForPre;
 import com.example.blog.Pojo.vo.UserVo;
 import com.example.blog.Service.UserService;
+import com.example.blog.utils.ThreadInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,6 +73,15 @@ public class UserController {
     public Result<String> removeLike(@PathVariable Long articleId) {
         return userService.removeLike(articleId);
     }
+
+    //新增评论
+    @PostMapping("/comment")
+    public Result<String> comment(@RequestBody CommentDTO commentDTO) {
+        ThreadInfo.setThread(2L);
+        userService.comment(commentDTO);
+        return Result.success();
+    }
+
 
 
 

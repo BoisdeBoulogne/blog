@@ -9,6 +9,7 @@ import com.example.blog.Pojo.entity.Article;
 import com.example.blog.Pojo.entity.Tag;
 import com.example.blog.Pojo.vo.ArticleVo;
 import com.example.blog.Pojo.vo.ArticleVoForPre;
+import com.example.blog.Pojo.vo.CommentVo;
 import com.example.blog.Service.ArticleService;
 import com.example.blog.constants.OtherConstants;
 import com.example.blog.utils.ThreadInfo;
@@ -17,6 +18,7 @@ import com.github.pagehelper.PageHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,7 +40,10 @@ public class ArticleServiceImpl implements ArticleService {
     LikeMapper likeMapper;
     @Autowired
     CollectMapper collectMapper;
+    @Autowired
+    CommentMapper commentMapper;
     @Override
+    @Transactional //通过事务来确保如果访问失败不会影响浏览数
     public Result<ArticleVo> getById(Long id) {
         Article article = articleMapper.getById(id);//获取文章详情
         article.setViews(article.getViews() + 1);
@@ -63,6 +68,8 @@ public class ArticleServiceImpl implements ArticleService {
         ArticleVo articleVo = new ArticleVo();
         BeanUtils.copyProperties(article, articleVo);
         articleVo.setTagsName(tagNames);
+        List<CommentVo> commentVos = commentMapper.getCommentsByArticleId(id);
+        articleVo.setComments(commentVos);
         return Result.success(articleVo);
     }
 
@@ -80,9 +87,12 @@ public class ArticleServiceImpl implements ArticleService {
         articleMapper.save(article);
         Long articleId = article.getId();
         List<Long> tagIds = articleSaveDTO.getTagIds();
-        for (Long tagId : tagIds) {
-            tag2ArticlesMapper.insert(articleId,tagId); //tag和article映射表
+        if (tagIds != null && tagIds.size() > 0) {
+            for (Long tagId : tagIds) {
+                tag2ArticlesMapper.insert(articleId,tagId); //tag和article映射表
+            }
         }
+
         return Result.success();
     }
     @Override

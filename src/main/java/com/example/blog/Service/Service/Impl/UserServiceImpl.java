@@ -2,8 +2,10 @@ package com.example.blog.Service.Service.Impl;
 import com.example.blog.Mapper.*;
 import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
+import com.example.blog.Pojo.dto.CommentDTO;
 import com.example.blog.Pojo.dto.UserLoginDTO;
 import com.example.blog.Pojo.entity.Article;
+import com.example.blog.Pojo.entity.Comments;
 import com.example.blog.Pojo.entity.Tag;
 import com.example.blog.Pojo.entity.User;
 import com.example.blog.Pojo.vo.ArticleVoForPre;
@@ -44,6 +46,8 @@ public class UserServiceImpl implements UserService {
     private Tag2ArticlesMapper tag2ArticlesMapper;
     @Autowired
     private LikeMapper likeMapper;
+    @Autowired
+    CommentMapper commentMapper;
     @Override
     public Result<String> login(UserLoginDTO userLogin) {
 
@@ -202,5 +206,16 @@ public class UserServiceImpl implements UserService {
         likeMapper.delete(articleId,userId);
         articleMapper.likeOrCollect(articleId,OtherConstants.likes,OtherConstants.delete);
         return Result.success();
+    }
+
+    @Override
+    public void comment(CommentDTO commentDTO) {
+        Long userId = ThreadInfo.getThread();
+        Comments comment = new Comments();
+        BeanUtils.copyProperties(commentDTO,comment);
+        comment.setUserId(userId);
+        String userName = userMapper.getNickNameById(userId);
+        comment.setUserNickname(userName);
+        commentMapper.insert(comment);
     }
 }

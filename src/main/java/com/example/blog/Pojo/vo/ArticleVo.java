@@ -16,4 +16,5 @@ public class ArticleVo {
     private Integer views;
     private Integer likes;
     private Integer collects;
+    private List<CommentVo> comments;
 }
