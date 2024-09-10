@@ -14,4 +14,6 @@ public class Article {
     private Long userId;
     private String content;
     private String author;
+    private Integer likes;
+    private Integer collects;
 }

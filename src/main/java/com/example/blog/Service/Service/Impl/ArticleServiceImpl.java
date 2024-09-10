@@ -4,9 +4,11 @@ import com.example.blog.Mapper.*;
 import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.dto.ArticleSaveDTO;
+import com.example.blog.Pojo.dto.KeyWordDTO;
 import com.example.blog.Pojo.entity.Article;
 import com.example.blog.Pojo.entity.Tag;
 import com.example.blog.Pojo.vo.ArticleVo;
+import com.example.blog.Pojo.vo.ArticleVoForPre;
 import com.example.blog.Service.ArticleService;
 import com.example.blog.constants.OtherConstants;
 import com.example.blog.utils.ThreadInfo;
@@ -32,6 +34,10 @@ public class ArticleServiceImpl implements ArticleService {
     private HistoryMapper historyMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    LikeMapper likeMapper;
+    @Autowired
+    CollectMapper collectMapper;
     @Override
     public Result<ArticleVo> getById(Long id) {
         Article article = articleMapper.getById(id);//获取文章详情
@@ -42,10 +48,9 @@ public class ArticleServiceImpl implements ArticleService {
         ThreadInfo.setThread(10L);
         Long userId = ThreadInfo.getThread();//获取当前用户ID
         if (userId != null) {
-            //todo 历史去重
-            historyMapper.insert(id,userId);
+            LocalDateTime now = LocalDateTime.now();
+            historyMapper.insert(id,userId,now);
         }
-        //todo 浏览次数加上
         articleMapper.update(article);
 
         List<Long> tagIds = tag2ArticlesMapper.getByArticleId(id);
@@ -144,5 +149,50 @@ public class ArticleServiceImpl implements ArticleService {
 
         BeanUtils.copyProperties(article, article1);
         articleMapper.update(article1);
+    }
+
+    @Override
+    public List<ArticleVoForPre> forHomePage() {
+        PageHelper.startPage(1,OtherConstants.pageSize);
+        List<Long> articlesId = articleMapper.forHomePage();
+        List<ArticleVoForPre> articleVos = new ArrayList<>();
+        for (Long articleId : articlesId) {
+            Article article = articleMapper.getById(articleId);
+            ArticleVoForPre articleVoForPre = new ArticleVoForPre();
+            BeanUtils.copyProperties(article, articleVoForPre);
+            List<Long> tags = tag2ArticlesMapper.getTagsIdByArticleId(articleId);
+            List<Tag> tagList = new ArrayList<>();
+            for (Long tagId : tags) {
+                Tag tag = tagMapper.getById(tagId);
+                tagList.add(tag);
+            }
+            articleVoForPre.setTags(tagList);
+            articleVos.add(articleVoForPre);
+        }
+        return articleVos;
+    }
+
+    @Override
+    public PageResult<ArticleVoForPre> getByKeyWord(KeyWordDTO keyword) {
+        PageHelper.startPage(keyword.getPageNum(),OtherConstants.pageSize);
+        List<Long> articlesId = articleMapper.getIdsByKeyWord(keyword.getKeyword());
+        List<ArticleVoForPre> articleVos = new ArrayList<>();
+        for (Long articleId : articlesId) {
+            Article article = articleMapper.getById(articleId);
+            ArticleVoForPre articleVoForPre = new ArticleVoForPre();
+            BeanUtils.copyProperties(article, articleVoForPre);
+            List<Long> tags = tag2ArticlesMapper.getTagsIdByArticleId(articleId);
+            List<Tag> tagList = new ArrayList<>();
+            for (Long tagId : tags) {
+                Tag tag = tagMapper.getById(tagId);
+                tagList.add(tag);
+            }
+            articleVoForPre.setTags(tagList);
+            articleVos.add(articleVoForPre);
+        }
+        PageResult pageResult = new PageResult();
+        pageResult.setTotal(articlesId.size());
+        pageResult.setList(articleVos);
+        return pageResult;
     }
 }

@@ -4,7 +4,7 @@
 
 <mapper namespace="com.example.blog.Mapper.ArticleMapper">
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO articles (user_id, create_time, update_time, views, content, title,author )
+        INSERT INTO articles (user_id, create_time, update_time, views, content, title,author)
         VALUES (#{userId}, #{createTime}, #{updateTime}, #{views}, #{content}, #{title},#{author})
     </insert>
     <select id="getUsefulById" resultType="com.example.blog.Pojo.entity.Article">
@@ -23,10 +23,36 @@
                 content = #{content},
             </if>
             <if test="views != null">
-                views = #{views}
+                views = #{views},
+            </if>
+            <if test="likes != null">
+                likes = #{likes},
+            </if>
+            <if test="collects != null">
+                collects = #{collects}
             </if>
         </set>
         where id = #{id}
     </update>
+
+
+
+    <update id="likeOrCollect">
+        update articles
+        <set>
+            <if test="collects = 1">
+                collects = collects + #{howMany}
+            </if>
+            <if test="collects = 0">
+                likes = likes + #{howMany}
+            </if>
+        </set>
+        where id = #{articleId}
+    </update>
+
+    <select id="forHomePage">
+        select id from articles
+        order by views + likes * 3 + collects *5
+    </select>
 
 </mapper>

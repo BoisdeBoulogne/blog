@@ -24,7 +24,6 @@ public class ArticleController {
     public Result<ArticleVo> getArticle(@PathVariable Long id) {
         return articleService.getById(id);
     }
-
     @PostMapping("/save")
     public Result<String> save(@RequestBody ArticleSaveDTO articleSaveDTO) {
         return articleService.save(articleSaveDTO);

@@ -1,14 +1,12 @@
 package com.example.blog.Service.Service.Impl;
-import com.example.blog.Mapper.ArticleMapper;
-import com.example.blog.Mapper.FollowMapper;
-import com.example.blog.Mapper.HistoryMapper;
-import com.example.blog.Mapper.UserMapper;
+import com.example.blog.Mapper.*;
 import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.dto.UserLoginDTO;
 import com.example.blog.Pojo.entity.Article;
+import com.example.blog.Pojo.entity.Tag;
 import com.example.blog.Pojo.entity.User;
-import com.example.blog.Pojo.vo.ArticleVo;
+import com.example.blog.Pojo.vo.ArticleVoForPre;
 import com.example.blog.Pojo.vo.UserVo;
 import com.example.blog.Service.UserService;
 import com.example.blog.constants.OtherConstants;
@@ -16,6 +14,7 @@ import com.example.blog.utils.JwtToken;
 import com.example.blog.utils.ThreadInfo;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +36,14 @@ public class UserServiceImpl implements UserService {
     private HistoryMapper historyMapper;
     @Autowired
     private ArticleMapper articleMapper;
+    @Autowired
+    private CollectMapper collectMapper;
+    @Autowired
+    private TagMapper tagMapper;
+    @Autowired
+    private Tag2ArticlesMapper tag2ArticlesMapper;
+    @Autowired
+    private LikeMapper likeMapper;
     @Override
     public Result<String> login(UserLoginDTO userLogin) {
 
@@ -61,7 +68,6 @@ public class UserServiceImpl implements UserService {
         ThreadInfo.setThread(2L);
         Long shootId = ThreadInfo.getThread();
         log.info("目标关注用户id: {}",targetId);
-        //todo 对应被关注者数据更新
         userMapper.shootAdd(shootId);
         userMapper.targetAdd(targetId);
         followMapper.insert(targetId,shootId);
@@ -85,17 +91,116 @@ public class UserServiceImpl implements UserService {
         pageResult.setList(users);
         return pageResult;
     }
-
     @Override
-    public PageResult<ArticleVo> getHistory(int pageNum) {
-        //todo
+    public PageResult<UserVo> getMyLeaders(int pageNum){
         PageHelper.startPage(pageNum,OtherConstants.pageSize);
         Long currId = ThreadInfo.getThread();
-        List<Long> articleIds = historyMapper.getArticleIdsByUserId(currId);
-        List<ArticleVo> articles = new ArrayList<>();
+        List<Long> leadersId = followMapper.getLeadersById(currId);
+        List<UserVo> users = new ArrayList<>();
+        for (Long id : leadersId){
+            UserVo userVo = userMapper.getVoById(id);
+            users.add(userVo);
+        }
+        PageResult<UserVo> pageResult = new PageResult<>();
+        pageResult.setTotal(users.size());
+        pageResult.setList(users);
+        return pageResult;
+    }
+
+
+
+    @Override
+    public Result<String> collect(Long articleId) {
+        ThreadInfo.setThread(2L);
+        Long userId = ThreadInfo.getThread();
+        int count = collectMapper.getCount(userId,articleId);
+        if (count != 0){
+            return Result.error("已经收藏过了");
+        }
+        collectMapper.insert(userId,articleId);
+        articleMapper.likeOrCollect(articleId,OtherConstants.collects,OtherConstants.add);
+        return Result.success();
+    }
+
+    @Override
+    public Result<String> removeCollect(Long articleId) {
+        Long userId = ThreadInfo.getThread();
+        int count = collectMapper.getCount(userId,articleId);
+        if (count == 0){
+            return Result.error("没有收藏过");
+        }
+        collectMapper.delete(userId,articleId);
+        return Result.success();
+    }
+
+    @Override
+    public Result<PageResult<ArticleVoForPre>> getMyCollect(int pageNum) {
+
+        PageHelper.startPage(pageNum,OtherConstants.pageSize);
+        Long currId = ThreadInfo.getThread();
+        List<Long> articleIds = collectMapper.getByUserId(currId);
+        List<ArticleVoForPre> articles = getArticleVoForPre(articleIds);
+        PageResult<ArticleVoForPre> pageResult = new PageResult<>();
+        pageResult.setTotal(articles.size());
+        pageResult.setList(articles);
+        return Result.success(pageResult);
+    }
+
+
+
+    public List<ArticleVoForPre> getArticleVoForPre(List<Long> articleIds) {
+        List<ArticleVoForPre> articles = new ArrayList<>();
         for (Long id : articleIds){
             Article article = articleMapper.getById(id);
+            ArticleVoForPre articleVoForPre = new ArticleVoForPre();
+            BeanUtils.copyProperties(article,articleVoForPre);
+            List<Long> tagIds = tag2ArticlesMapper.getTagsIdByArticleId(article.getId());
+            List<Tag> tags = new ArrayList<>();
+            for (Long tagId : tagIds){
+                Tag tag = tagMapper.getById(tagId);
+                tags.add(tag);
+            }
+            articleVoForPre.setTags(tags);
+            articles.add(articleVoForPre);
         }
-        return null;
+        return articles;
+    }
+
+    @Override
+    public Result<PageResult<ArticleVoForPre>> getMyHistory(int pageNum) {
+        PageHelper.startPage(pageNum,OtherConstants.pageSize);
+
+        Long currId = ThreadInfo.getThread();
+        List<Long> articleIds = historyMapper.getArticleIdsByUserId(currId);
+        List<ArticleVoForPre> articles = getArticleVoForPre(articleIds);
+        PageResult<ArticleVoForPre> pageResult = new PageResult<>();
+        pageResult.setTotal(articles.size());
+        pageResult.setList(articles);
+        return Result.success(pageResult);
+    }
+
+    @Override
+    public Result<String> like(Long articleId) {
+
+        Long userId = ThreadInfo.getThread();
+        int count = likeMapper.getCount(articleId,userId);
+        if (count != 0){
+            return Result.error("已经点赞过");
+        }
+        likeMapper.insert(articleId,userId);
+        articleMapper.likeOrCollect(articleId,OtherConstants.likes,OtherConstants.add);
+        return Result.success();
+    }
+
+    @Override
+    public Result<String> removeLike(Long articleId) {
+        int count = likeMapper.getCount(articleId,ThreadInfo.getThread());
+        if (count == 0){
+            return Result.error("还未点赞");
+        }
+        Long userId = ThreadInfo.getThread();
+        likeMapper.delete(articleId,userId);
+        articleMapper.likeOrCollect(articleId,OtherConstants.likes,OtherConstants.delete);
+        return Result.success();
     }
 }

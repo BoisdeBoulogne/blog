@@ -1,18 +1,19 @@
 package com.example.blog.Pojo.vo;
 
+import com.example.blog.Pojo.entity.Tag;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class ArticleVo {
+public class ArticleVoForPre {
+    private Long id;
     private String title;
-    private String content;
+    private String author;
+    private List<Tag> tags;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
-    private String author;
-    private List<String> tagsName;
     private Integer views;
     private Integer likes;
     private Integer collects;
