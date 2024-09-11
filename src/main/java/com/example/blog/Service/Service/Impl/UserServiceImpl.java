@@ -2,9 +2,7 @@ package com.example.blog.Service.Service.Impl;
 import com.example.blog.Mapper.*;
 import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
-import com.example.blog.Pojo.dto.CommentDTO;
-import com.example.blog.Pojo.dto.UserLoginDTO;
-import com.example.blog.Pojo.dto.UserSignInDTO;
+import com.example.blog.Pojo.dto.*;
 import com.example.blog.Pojo.entity.Article;
 import com.example.blog.Pojo.entity.Comments;
 import com.example.blog.Pojo.entity.Tag;
@@ -100,6 +98,40 @@ public class UserServiceImpl implements UserService {
         claims.put("userId", user.getId());//Jwt使用账号来标明是哪个用户
         String token = jwtToken.createToken(claims);
         return Result.success(token);
+    }
+
+    @Override
+    public Result<String> loginByPhoneNumber(UserLoginByPhoneNumberDTO userLoginByPhoneNumberDTO) {
+        String phoneNumber = userLoginByPhoneNumberDTO.getPhoneNumber();
+        int count = userMapper.getByPhoneNumber(phoneNumber);
+        if (count == 0 ){
+            return Result.error("未注册的用户");
+        }
+        String realCode = stringRedisTemplate.opsForValue().get("code:"+ phoneNumber);
+        if (realCode == null || !realCode.equals(userLoginByPhoneNumberDTO.getCode())) {
+            return Result.error("未发送验证码或验证码错误");
+        }
+        Long userId = userMapper.getIdByPhoneNumber(phoneNumber);
+        Map<String,Object> claims = new HashMap<>();
+        claims.put("userId", userId);//Jwt使用账号来标明是哪个用户
+        String token = jwtToken.createToken(claims);
+        return Result.success(token);
+    }
+
+    @Override
+    public Result<String> resetPassword(UserResetPassword userResetPassword) {
+        String phoneNumber = userResetPassword.getPhoneNumber();
+        int count = userMapper.getByPhoneNumber(phoneNumber);
+        if (count == 0 ){
+            return Result.error("未注册的用户");
+        }
+        String code = userResetPassword.getCode();
+        String realCode = stringRedisTemplate.opsForValue().get("code:"+ phoneNumber);
+        if (code ==null || realCode == null || !code.equals(realCode)) {
+            return Result.error("总之出现错误");
+        }
+        userMapper.resetPassword(userResetPassword);
+        return Result.success();
     }
 
     @Override
