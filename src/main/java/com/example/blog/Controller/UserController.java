@@ -23,9 +23,14 @@ public class UserController {
     }
 
     //关注用户 已测试
-    @PutMapping("/follow/{targetUserNickname}")
-    public Result<String> follow(@PathVariable String targetUserNickname) {
-        return userService.follow(targetUserNickname);
+    @PutMapping("/follow/{targetUserId}")
+    public Result<String> follow(@PathVariable Long targetUserId) {
+        return userService.follow(targetUserId);
+    }
+
+    @PutMapping("/unfollow/{targetUserId}")
+    public Result<String> removeFollow(@PathVariable Long targetUserId) {
+        return userService.removeFollow(targetUserId);
     }
     //查看自己粉丝 //已测试
     @GetMapping("/myFans/{pageNum}")

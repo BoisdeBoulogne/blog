@@ -1,5 +1,6 @@
 package com.example.blog.Pojo.vo;
 
+import com.example.blog.Pojo.entity.Tag;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -12,7 +13,7 @@ public class ArticleVo {
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
     private String author;
-    private List<String> tagsName;
+    private List<Tag> tags;
     private Integer views;
     private Integer likes;
     private Integer collects;

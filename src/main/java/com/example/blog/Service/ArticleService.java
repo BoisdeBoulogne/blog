@@ -29,5 +29,5 @@ public interface ArticleService {
 
     List<ArticleVoForPre> forHomePage();
 
-    PageResult<ArticleVoForPre> getByKeyWord(KeyWordDTO keyword);
+    Result<PageResult<ArticleVoForPre>> getByKeyWord(KeyWordDTO keyword);
 }

@@ -1,5 +1,6 @@
 package com.example.blog.Mapper;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -16,4 +17,10 @@ public interface FollowMapper {
 
     @Select("select follower_id from follow where leader_id = #{currId}")
     List<Long> getLeadersById(Long currId);
+
+    @Select("select count(*) from follow where leader_id = #{targetId} and follower_id = #{shootId}")
+    Integer getCount(Long shootId, Long targetId);
+
+    @Delete("delete from follow where follower_id = #{followId} and leader_id = #{targetId}")
+    void delete(Long followId, Long targetId);
 }

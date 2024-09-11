@@ -10,7 +10,7 @@ import com.example.blog.Pojo.vo.UserVo;
 public interface UserService {
     Result<String> login(UserLoginDTO userLogin);
 
-    Result<String> follow(String targetUserId);
+    Result<String> follow(Long targetUserId);
 
     PageResult getMyFans(int pageNum);
 
@@ -30,4 +30,6 @@ public interface UserService {
     Result<String> removeCollect(Long articleId);
 
     void comment(CommentDTO commentDTO);
+
+    Result<String> removeFollow(Long targetUserId);
 }

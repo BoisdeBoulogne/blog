@@ -64,17 +64,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result<String> follow(String targetUserNickname) {
-        Long targetId = userMapper.getByNickname(targetUserNickname);
-        if(targetId == null) {
+    public Result<String> follow(Long targetId) {
+        Integer exist = userMapper.exist(targetId);
+        if(exist == 0) {
             return Result.error("不存在的用户");
         }
-        ThreadInfo.setThread(2L);
         Long shootId = ThreadInfo.getThread();
+        Integer count = followMapper.getCount(shootId,targetId);
+        if (count > 0) {
+            return Result.error("已关注");
+        }
         log.info("目标关注用户id: {}",targetId);
         userMapper.shootAdd(shootId);
         userMapper.targetAdd(targetId);
         followMapper.insert(targetId,shootId);
+        return Result.success();
+    }
+
+    @Override
+    public Result<String> removeFollow(Long targetId) {
+        Integer exist = userMapper.exist(targetId);
+        if(exist == 0) {
+            return Result.error("不存在的用户");
+        }
+        Long followId = ThreadInfo.getThread();
+        Integer count = followMapper.getCount(followId,targetId);
+        if (count == 0) {
+            return Result.error("未关注");
+        }
+        followMapper.delete(followId,targetId);
         return Result.success();
     }
 
