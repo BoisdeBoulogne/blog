@@ -5,4 +5,7 @@
     <select id="getVoById" resultType="com.example.blog.Pojo.vo.UserVo">
         select avatar_url,nickname,follower_count,following_count from user where id = #{id}
     </select>
+    <insert id="insert">
+        insert into user (password, nickname, avatar_url,phone_number) values (#{password},#{nickname},#{avatarUrl},#{phoneNumber})
+    </insert>
 </mapper>

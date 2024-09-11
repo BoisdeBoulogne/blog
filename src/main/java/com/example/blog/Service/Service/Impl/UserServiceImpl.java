@@ -4,6 +4,7 @@ import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.dto.CommentDTO;
 import com.example.blog.Pojo.dto.UserLoginDTO;
+import com.example.blog.Pojo.dto.UserSignInDTO;
 import com.example.blog.Pojo.entity.Article;
 import com.example.blog.Pojo.entity.Comments;
 import com.example.blog.Pojo.entity.Tag;
@@ -18,12 +19,13 @@ import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -48,6 +50,43 @@ public class UserServiceImpl implements UserService {
     private LikeMapper likeMapper;
     @Autowired
     CommentMapper commentMapper;
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+
+    @Override
+    public Result<String> getCode(String phoneNumber) {
+        if ( phoneNumber == null||!judgePhoneNumber(phoneNumber)) {
+            return Result.error("电话号码格式错误或为空");
+        }
+        String code = randomString();
+        stringRedisTemplate.opsForValue().set("code:"+ phoneNumber,code,5, TimeUnit.MINUTES);
+        log.info("code:{}",code);
+        return Result.success(code);
+    }
+
+    @Override
+    public Result<String> signIn(UserSignInDTO userSignInDTO) {
+        String phoneNumber = userSignInDTO.getPhoneNumber();
+        if ( phoneNumber == null||!judgePhoneNumber(phoneNumber)) {
+            return Result.error("电话号码格式错误或为空");
+        }
+        String code = userSignInDTO.getCode();
+        String realCode = stringRedisTemplate.opsForValue().get("code:"+ phoneNumber);
+        if (code ==null || realCode == null || !code.equals(realCode)) {
+            return Result.error("验证码错误或没有获取验证码");
+        }
+        User user = new User();
+        BeanUtils.copyProperties(userSignInDTO,user);
+        try {
+            userMapper.insert(user);
+        } catch (Exception e) {
+            if (e instanceof DuplicateKeyException) {
+                return Result.error("已存在的用户");
+            }
+        }
+        return Result.success();
+    }
+
     @Override
     public Result<String> login(UserLoginDTO userLogin) {
 
@@ -235,5 +274,16 @@ public class UserServiceImpl implements UserService {
         String userName = userMapper.getNickNameById(userId);
         comment.setUserNickname(userName);
         commentMapper.insert(comment);
+    }
+
+
+    private boolean judgePhoneNumber(String phoneNumber){
+            return Pattern.matches(OtherConstants.CHINA_PHONE_NUMBER_REGEX, phoneNumber);
+    }
+
+    private String randomString(){
+        Random random = new Random();
+        Integer randomInt = 100000+ random.nextInt(999999);
+        return String.valueOf(randomInt);
     }
 }

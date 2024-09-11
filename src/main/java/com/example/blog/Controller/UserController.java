@@ -5,6 +5,7 @@ import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.dto.CommentDTO;
 import com.example.blog.Pojo.dto.UserLoginDTO;
 
+import com.example.blog.Pojo.dto.UserSignInDTO;
 import com.example.blog.Pojo.vo.ArticleVoForPre;
 import com.example.blog.Pojo.vo.UserVo;
 import com.example.blog.Service.UserService;
@@ -17,6 +18,15 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Autowired
     UserService userService;
+
+    @GetMapping("/code/{phoneNumber}")
+    public Result<String> getCode(@PathVariable String phoneNumber) {
+        return userService.getCode(phoneNumber);
+    }
+    @PostMapping("/signIn")
+    public Result<String> signIn(@RequestBody UserSignInDTO userSignInDTO) {
+        return userService.signIn(userSignInDTO);
+    }
 
     @PostMapping("/login")
     public Result<String> login(@RequestBody UserLoginDTO userLoginDTO) {

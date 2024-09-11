@@ -31,4 +31,6 @@ public interface UserMapper {
     String getNickNameById(Long userId);
     @Select("select count(*) from user where id = #{targetId}")
     Integer exist(Long targetId);
+
+    void insert(User user);
 }

@@ -6,11 +6,18 @@ spring:
     password: xujiaxing@413
     url: jdbc:mysql://47.121.29.138:3306/blog
     driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: 47.121.29.138
+      port: 6379
+
 
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   mapper-locations: classpath:Mapper/*.xml
+
+
 
 
