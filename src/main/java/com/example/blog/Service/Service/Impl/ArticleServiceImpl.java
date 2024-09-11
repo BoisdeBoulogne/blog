@@ -127,7 +127,7 @@ public class ArticleServiceImpl implements ArticleService {
         Long userId = ThreadInfo.getThread();
         Long realUserId = articleMapper.getUserIdByArticleId(id);
         if (userId != realUserId){
-            return Result.error("没用权限！");
+            return Result.error("没权限！");
         }
         articleMapper.deleteById(id);
         return Result.success();

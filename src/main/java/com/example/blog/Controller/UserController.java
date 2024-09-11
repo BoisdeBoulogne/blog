@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Autowired
     UserService userService;
+
     @PostMapping("/login")
     public Result<String> login(@RequestBody UserLoginDTO userLoginDTO) {
         return userService.login(userLoginDTO);
