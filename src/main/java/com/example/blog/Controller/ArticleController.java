@@ -36,8 +36,7 @@ public class ArticleController {
 
     @DeleteMapping("/delete/{id}")
     public Result<String> delete(@PathVariable Long id) {
-        articleService.delete(id);
-        return Result.success();
+        return  articleService.delete(id);
     }
 
     @PutMapping("/update/{id}")

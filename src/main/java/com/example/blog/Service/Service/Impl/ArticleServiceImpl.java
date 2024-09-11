@@ -123,8 +123,14 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public void delete(Long id) {
+    public Result<String> delete(Long id) {
+        Long userId = ThreadInfo.getThread();
+        Long realUserId = articleMapper.getUserIdByArticleId(id);
+        if (userId != realUserId){
+            return Result.error("没用权限！");
+        }
         articleMapper.deleteById(id);
+        return Result.success();
     }
 
     @Override

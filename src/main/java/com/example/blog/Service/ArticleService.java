@@ -18,7 +18,7 @@ public interface ArticleService {
 
     Result<PageResult> getUsefulById(Integer page);
 
-    void delete(Long id);
+    Result<String> delete(Long id);
 
     void update(Article article);
 

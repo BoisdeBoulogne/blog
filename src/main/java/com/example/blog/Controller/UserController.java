@@ -27,7 +27,7 @@ public class UserController {
     public Result<String> follow(@PathVariable Long targetUserId) {
         return userService.follow(targetUserId);
     }
-
+    //取消关注
     @PutMapping("/unfollow/{targetUserId}")
     public Result<String> removeFollow(@PathVariable Long targetUserId) {
         return userService.removeFollow(targetUserId);

@@ -32,4 +32,7 @@ public interface ArticleMapper {
 
     @Select("select id from articles where content like concat ('%',#{keyword},'%')")
     List<Long> getIdsByKeyWord(String keyword);
+
+    @Select("select user_id from articles where id = #{id}")
+    Long getUserIdByArticleId(Long id);
 }
