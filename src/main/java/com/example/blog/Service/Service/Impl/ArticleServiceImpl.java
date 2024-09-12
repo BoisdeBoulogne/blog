@@ -1,5 +1,8 @@
 package com.example.blog.Service.Service.Impl;
 
+import cn.hutool.core.util.BooleanUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.example.blog.Mapper.*;
 import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
@@ -17,15 +20,21 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
+    private int c = 0;
+
     @Autowired
     private ArticleMapper articleMapper;
     @Autowired
@@ -42,35 +51,57 @@ public class ArticleServiceImpl implements ArticleService {
     CollectMapper collectMapper;
     @Autowired
     CommentMapper commentMapper;
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
     @Override
-    @Transactional //通过事务来确保如果访问失败不会影响浏览数
     public Result<ArticleVo> getById(Long id) {
-        Article article = articleMapper.getById(id);//获取文章详情
-        article.setViews(article.getViews() + 1);
-        if (article == null) {
+        ArticleVo articleVo = cacheArticle(id);
+        if (articleVo == null) {
             return Result.error("不存在的文章");
         }
-        ThreadInfo.setThread(10L);
-        Long userId = ThreadInfo.getThread();//获取当前用户ID
-        if (userId != null) {
-            LocalDateTime now = LocalDateTime.now();
-            historyMapper.insert(id,userId,now);
-        }
-        articleMapper.update(article);
-
-        List<Long> tagIds = tag2ArticlesMapper.getByArticleId(id);
-        List<Tag> tags = new ArrayList<>();
-        for (Long tagId : tagIds) {
-            Tag tag = tagMapper.getById(tagId);
-            tags.add(tag);
-        }
-
-        ArticleVo articleVo = new ArticleVo();
-        BeanUtils.copyProperties(article, articleVo);
-        articleVo.setTags(tags);
-        List<CommentVo> commentVos = commentMapper.getCommentsByArticleId(id);
-        articleVo.setComments(commentVos);
         return Result.success(articleVo);
+    }
+
+    private ArticleVo cacheArticle(Long id){
+        String cacheKey = "cache:article:" + id;
+        String JSONStr = stringRedisTemplate.opsForValue().get(cacheKey);
+        if (StrUtil.isNotBlank(JSONStr)) {
+            return JSONUtil.toBean(JSONStr, ArticleVo.class);
+        }
+        if (JSONStr != null) {
+            return null;
+        }
+        String lockKey = "lock:article:" + id;
+        try {
+            boolean isLock = tryLock(lockKey);
+            if (!isLock) {
+                Thread.sleep(50);
+                return cacheArticle(id);
+            }
+            Article article = articleMapper.getById(id);
+            if (article == null) {
+                stringRedisTemplate.opsForValue().set(cacheKey, "", 5, TimeUnit.MINUTES);
+            }
+            ArticleVo articleVo = new ArticleVo();
+            BeanUtils.copyProperties(article, articleVo);
+            List<Long> tagIds = tag2ArticlesMapper.getTagsIdByArticleId(id);
+            List<Tag> tags = new ArrayList<>();
+            for (Long tagId : tagIds) {
+                Tag tag = tagMapper.getById(tagId);
+                tags.add(tag);
+            }
+            articleVo.setTags(tags);
+            List<CommentVo> commentVos = commentMapper.getCommentsByArticleId(id);
+            articleVo.setComments(commentVos);
+            String cache = JSONUtil.toJsonStr(articleVo);
+            stringRedisTemplate.opsForValue().set(cacheKey, cache, 30, TimeUnit.MINUTES);
+            return articleVo;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }   finally {
+            unlock(lockKey);
+        }
+        return null;
     }
 
     @Override
@@ -215,4 +246,14 @@ public class ArticleServiceImpl implements ArticleService {
         pageResult.setList(articleVos);
         return Result.success(pageResult);
     }
+
+    private boolean tryLock(String key){
+        Boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(key,"1",30,TimeUnit.SECONDS);
+        return BooleanUtil.isTrue(flag);
+    }
+
+    private void unlock(String key){
+        stringRedisTemplate.delete(key);
+    }
+
 }
