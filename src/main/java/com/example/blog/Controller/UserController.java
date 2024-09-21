@@ -2,10 +2,8 @@ package com.example.blog.Controller;
 
 import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
-import com.example.blog.Pojo.dto.CommentDTO;
-import com.example.blog.Pojo.dto.UserLoginDTO;
+import com.example.blog.Pojo.dto.*;
 
-import com.example.blog.Pojo.dto.UserSignInDTO;
 import com.example.blog.Pojo.vo.ArticleVoForPre;
 import com.example.blog.Pojo.vo.UserVo;
 import com.example.blog.Service.UserService;
@@ -19,18 +17,30 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    //获取验证码
     @GetMapping("/code/{phoneNumber}")
     public Result<String> getCode(@PathVariable String phoneNumber) {
         return userService.getCode(phoneNumber);
     }
+    //注册
     @PostMapping("/signIn")
     public Result<String> signIn(@RequestBody UserSignInDTO userSignInDTO) {
         return userService.signIn(userSignInDTO);
     }
-
+    //手机号验证码登录
+    @PostMapping("loginByPhoneNumber")
+    public Result<String> loginByPhoneNumber(@RequestBody UserLoginByPhoneNumberDTO userLoginByPhoneNumberDTO) {
+        return userService.loginByPhoneNumber(userLoginByPhoneNumberDTO);
+    }
+    //账号密码登录
     @PostMapping("/login")
     public Result<String> login(@RequestBody UserLoginDTO userLoginDTO) {
         return userService.login(userLoginDTO);
+    }
+
+    @PostMapping("/resetPassword")
+    public Result<String> resetPassword(@RequestBody UserResetPassword userResetPassword){
+        return userService.resetPassword(userResetPassword);
     }
 
     //关注用户 已测试
