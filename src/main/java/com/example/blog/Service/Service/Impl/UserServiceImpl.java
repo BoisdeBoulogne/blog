@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
                 return Result.error("已存在的用户");
             }
         }
-        return Result.success();
+        return Result.success("注册成功");
     }
 
     @Override
@@ -137,11 +137,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result<String> follow(Long targetId) {
+        Long shootId = ThreadInfo.getThread();
+        if (shootId == null){
+            return Result.error("未登录");
+        }
         Integer exist = userMapper.exist(targetId);
         if(exist == 0) {
             return Result.error("不存在的用户");
         }
-        Long shootId = ThreadInfo.getThread();
+
         Integer count = followMapper.getCount(shootId,targetId);
         if (count > 0) {
             return Result.error("已关注");
@@ -160,6 +164,9 @@ public class UserServiceImpl implements UserService {
             return Result.error("不存在的用户");
         }
         Long followId = ThreadInfo.getThread();
+        if (followId == null){
+            return Result.error("未登录");
+        }
         Integer count = followMapper.getCount(followId,targetId);
         if (count == 0) {
             return Result.error("未关注");
@@ -171,9 +178,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public PageResult<UserVo> getMyFans(int pageNum) {
 
-        PageHelper.startPage(pageNum,OtherConstants.pageSize);
-        ThreadInfo.setThread(3L);
         Long currId = ThreadInfo.getThread();
+
+        PageHelper.startPage(pageNum,OtherConstants.pageSize);
+
+
+
         List<Long> fansId = followMapper.getFansById(currId);
         List<UserVo> users = new ArrayList<>();
         for (Long id : fansId){

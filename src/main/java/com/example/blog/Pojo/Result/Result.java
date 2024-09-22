@@ -18,6 +18,13 @@ public class Result<T> {
         return result;
     }
 
+    public static <T> Result<T> success(String msg) {
+        Result<T> result = new Result<T>();
+        result.code = 1;
+        result.msg = msg;
+        return result;
+    }
+
     public static <T> Result<T> success(T object) {
         Result<T> result = new Result<T>();
         result.data = object;

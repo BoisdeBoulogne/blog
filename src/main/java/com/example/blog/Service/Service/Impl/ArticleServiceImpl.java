@@ -64,24 +64,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     }
 
-    private ArticleVo test(Long id) {
-        ArticleVo articleVo = new ArticleVo();
-        Article article = articleMapper.getById(id);
-        if (article == null) {
-            return null;
-        }
-        BeanUtils.copyProperties(article, articleVo);
-        List<Long> tagsId = tag2ArticlesMapper.getTagsIdByArticleId(id);
-        List<Tag> tags = new ArrayList<>();
-        for (Long tagId : tagsId) {
-            Tag tag = tagMapper.getById(tagId);
-            tags.add(tag);
-        }
-        articleVo.setTags(tags);
-        List<CommentVo> commentVos = commentMapper.getCommentsByArticleId(id);
-        articleVo.setComments(commentVos);
-        return articleVo;
-    }
+
     private ArticleVo cacheArticle(Long id){
         String cacheKey = "cache:article:" + id;
         String JSONStr = stringRedisTemplate.opsForValue().get(cacheKey);
@@ -192,16 +175,6 @@ public class ArticleServiceImpl implements ArticleService {
         articleMapper.update(article);
     }
 
-    @Override
-    public List<Tag> getArticleTags(Long articleId) {
-        List<Long> tags = tag2ArticlesMapper.getTagsIdByArticleId(articleId);
-        List<Tag> tagList = new ArrayList<>();
-        for (Long tagId : tags) {
-            Tag tag = tagMapper.getById(tagId);
-            tagList.add(tag);
-        }
-        return tagList;
-    }
 
     @Override
     public void updateWithId(ArticleSaveDTO article, Long id) {

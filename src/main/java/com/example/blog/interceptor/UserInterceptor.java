@@ -11,7 +11,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.Map;
 
-
 @Slf4j
 @Component
 public class UserInterceptor implements HandlerInterceptor {

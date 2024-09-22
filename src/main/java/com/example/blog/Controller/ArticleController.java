@@ -46,9 +46,4 @@ public class ArticleController {
         return Result.success();
     }
 
-    @GetMapping("/tags/{articleId}")
-    public Result<List<Tag>> getArticleTags(@PathVariable Long articleId) {
-        List<Tag> tags = articleService.getArticleTags(articleId);
-        return Result.success(tags);
-    }
 }

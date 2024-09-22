@@ -13,13 +13,16 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(userInterceptor).
-                excludePathPatterns("/**");
+        registry.addInterceptor(userInterceptor)
+                .addPathPatterns("/user/**")
+                .excludePathPatterns("/user/code/*", "/user/signIn", "/user/login", "/user/loginByPhoneNumber", "/user/resetPassword")
+                .addPathPatterns("/article/save", "/article/deleteOrUpdatePage/*", "/article/delete/*", "/article/update");
     }
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:*") // 允许来自任意端口的localhost请求
+                .allowedOrigins("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*");
     }

@@ -22,7 +22,7 @@ public interface ArticleService {
 
     void update(Article article);
 
-    List<Tag> getArticleTags(Long articleId);
+
 
     void updateWithId(ArticleSaveDTO article, Long id);
 
