@@ -13,13 +13,16 @@ import java.util.List;
 public class TagController {
     @Autowired
     TagService tagService;
-    @PostMapping("/save")
-    public Result save(@RequestBody Tag tag) {
-        return tagService.save(tag);
+    @PostMapping("/save/tagName")
+    public Result save(@PathVariable String tagName) {
+        return tagService.save(tagName);
     }
     @GetMapping("/all")
     public Result<List<Tag>> getAllTags(){
         List<Tag> tags = tagService.getAllTags();
+        if(tags==null){
+            return Result.error("暂时没有标签");
+        }
         return Result.success(tags);
     }
 

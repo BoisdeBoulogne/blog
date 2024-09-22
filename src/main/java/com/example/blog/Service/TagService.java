@@ -6,7 +6,7 @@ import com.example.blog.Pojo.entity.Tag;
 import java.util.List;
 
 public interface TagService {
-    Result save(Tag tag);
+    Result save(String tag);
 
     List<Tag> getAllTags();
 }

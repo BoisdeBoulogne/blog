@@ -10,14 +10,14 @@ import java.util.List;
 @Mapper
 public interface TagMapper {
 
-    @Insert("insert into tag (tag_name) values (#{tagName})")
-    void insert(Tag tag);
+    @Insert("insert into tag (tag_name) values (#{tag})")
+    void insert(String tag);
 
     @Select("select * from tag")
     List<Tag> getAllTags();
 
-    @Select("select * from tag where tag_name = #{tagName}")
-    Tag getByTagName(String tagName);
+    @Select("select count(*) from tag where tag_name = #{tagName}")
+    Integer getByTagName(String tagName);
 
     @Select("select tag_name from tag where id = #{tagId}")
     String getNameById(Long tagId);

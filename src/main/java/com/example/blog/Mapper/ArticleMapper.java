@@ -35,4 +35,7 @@ public interface ArticleMapper {
 
     @Select("select user_id from articles where id = #{id}")
     Long getUserIdByArticleId(Long id);
+
+    @Update("update articles set views = views + 1 where id = #{id}")
+    void addViews(Long id);
 }
