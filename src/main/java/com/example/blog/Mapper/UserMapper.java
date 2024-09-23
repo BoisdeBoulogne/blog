@@ -2,6 +2,7 @@ package com.example.blog.Mapper;
 
 import com.example.blog.Pojo.dto.UserLoginDTO;
 import com.example.blog.Pojo.dto.UserResetPassword;
+import com.example.blog.Pojo.dto.UserSignInDTO;
 import com.example.blog.Pojo.entity.User;
 import com.example.blog.Pojo.vo.UserVo;
 import com.github.pagehelper.Page;
@@ -43,4 +44,6 @@ public interface UserMapper {
 
     @Update("update user set password = #{resetPassword} where phone_number = #{phoneNumber}")
     void resetPassword(UserResetPassword userResetPassword);
+    @Select("select count(*) from user where nickname = #{nickname} or phone_number = #{phoneNumber} ")
+    Integer checkSignIn(UserSignInDTO userSignInDTO);
 }

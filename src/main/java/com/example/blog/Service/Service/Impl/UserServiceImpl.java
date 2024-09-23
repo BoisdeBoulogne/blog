@@ -68,6 +68,10 @@ public class UserServiceImpl implements UserService {
         if ( phoneNumber == null||!judgePhoneNumber(phoneNumber)) {
             return Result.error("电话号码格式错误或为空");
         }
+        Integer count = userMapper.checkSignIn(userSignInDTO);
+        if (count != 0) {
+            return Result.error("用户名或手机号码被占用");
+        }
         String code = userSignInDTO.getCode();
         String realCode = stringRedisTemplate.opsForValue().get("code:"+ phoneNumber);
         if (code ==null || realCode == null || !code.equals(realCode)) {
@@ -75,6 +79,9 @@ public class UserServiceImpl implements UserService {
         }
         User user = new User();
         BeanUtils.copyProperties(userSignInDTO,user);
+        if(userSignInDTO.getAvatarUrl() == null){
+            user.setAvatarUrl("https://only-shollow.oss-cn-beijing.aliyuncs.com/e6f5e41f13534bf2a8df7bcf44df3d40R-C.jpg");
+        }
         try {
             userMapper.insert(user);
         } catch (Exception e) {
