@@ -20,4 +20,7 @@ public interface Tag2ArticlesMapper {
 
     @Delete("delete from tag2articles where articles_id = #{id}")
     void deleteByArticleId(Long id);
+
+    @Select("select articles_id from tag2articles where tag_id = #{tagId}")
+    List<Long> getArticlesIdByTagId(Long tagId);
 }

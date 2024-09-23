@@ -3,10 +3,13 @@ package com.example.blog.Controller;
 import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.dto.ArticleSaveDTO;
+import com.example.blog.Pojo.dto.SearchArticlesByTagIdDTO;
 import com.example.blog.Pojo.entity.Article;
 import com.example.blog.Pojo.entity.Tag;
 import com.example.blog.Pojo.vo.ArticleVo;
+import com.example.blog.Pojo.vo.ArticleVoForPre;
 import com.example.blog.Service.ArticleService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@Slf4j
 @RequestMapping("/article")
 public class ArticleController {
     @Autowired
@@ -44,6 +48,13 @@ public class ArticleController {
 
         articleService.updateWithId(article,id);
         return Result.success();
+    }
+
+    @GetMapping("/commonTags")
+    public Result<PageResult<ArticleVoForPre>> commonTags(@RequestBody SearchArticlesByTagIdDTO dto) {
+        log.info(dto.toString());
+        return articleService.commonTags(dto);
+
     }
 
 }

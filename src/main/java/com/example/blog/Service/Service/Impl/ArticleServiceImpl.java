@@ -1,13 +1,12 @@
 package com.example.blog.Service.Service.Impl;
 
-import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
+
 import com.example.blog.Mapper.*;
 import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.dto.ArticleSaveDTO;
 import com.example.blog.Pojo.dto.KeyWordDTO;
+import com.example.blog.Pojo.dto.SearchArticlesByTagIdDTO;
 import com.example.blog.Pojo.entity.Article;
 import com.example.blog.Pojo.entity.Tag;
 import com.example.blog.Pojo.vo.ArticleVo;
@@ -22,14 +21,12 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -61,7 +58,7 @@ public class ArticleServiceImpl implements ArticleService {
         if (article == null) {
             return Result.error("不存在的文章");
         }
-        if (userId != null && article != null) {
+        if (userId != null) {
             historyMapper.insert(id,userId,LocalDateTime.now());
         }
 
@@ -134,7 +131,7 @@ public class ArticleServiceImpl implements ArticleService {
     public Result<String> delete(Long id) {
         Long userId = ThreadInfo.getThread();
         Long realUserId = articleMapper.getUserIdByArticleId(id);
-        if (userId == null || userId != realUserId){
+        if (userId == null || userId .equals(realUserId)){
             return Result.error("没权限！");
         }
         String cacheKey = "cache:article:" + id;
@@ -218,6 +215,35 @@ public class ArticleServiceImpl implements ArticleService {
         return Result.success(pageResult);
     }
 
+    @Override
+    public Result<PageResult<ArticleVoForPre>> commonTags(SearchArticlesByTagIdDTO dto) {
+        PageHelper.startPage(dto.getPageNum(),OtherConstants.pageSize);
+        List<Long> articlesId = tag2ArticlesMapper.getArticlesIdByTagId(dto.getTagId());
+        Tag tag1 = tagMapper.getById(dto.getTagId());
+        if (tag1 == null){
+            return Result.error("不存在的标签");
+        }
+        if (articlesId == null || articlesId.size() == 0) {
+            return Result.error("还不存在相关文章");
+        }
+        List<ArticleVoForPre> articleVoForPres = new ArrayList<>();
+        for (Long articleId : articlesId){
+            ArticleVoForPre articleVoForPre = new ArticleVoForPre();
+            Article article = articleMapper.getById(articleId);
+            BeanUtils.copyProperties(article, articleVoForPre);
+            List<Long> tags = tag2ArticlesMapper.getTagsIdByArticleId(articleId);
+            List<Tag> tagList = new ArrayList<>();
+            for (Long tagId : tags) {
+                Tag tag = tagMapper.getById(tagId);
+                tagList.add(tag);
 
-
+            }
+            articleVoForPre.setTags(tagList);
+            articleVoForPres.add(articleVoForPre);
+        }
+        PageResult pageResult = new PageResult();
+        pageResult.setTotal(articlesId.size());
+        pageResult.setList(articleVoForPres);
+        return Result.success(pageResult);
+    }
 }

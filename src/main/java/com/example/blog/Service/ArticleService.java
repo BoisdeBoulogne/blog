@@ -4,6 +4,7 @@ import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.dto.ArticleSaveDTO;
 import com.example.blog.Pojo.dto.KeyWordDTO;
+import com.example.blog.Pojo.dto.SearchArticlesByTagIdDTO;
 import com.example.blog.Pojo.entity.Article;
 import com.example.blog.Pojo.entity.Tag;
 import com.example.blog.Pojo.vo.ArticleVo;
@@ -30,4 +31,6 @@ public interface ArticleService {
     List<ArticleVoForPre> forHomePage();
 
     Result<PageResult<ArticleVoForPre>> getByKeyWord(KeyWordDTO keyword);
+
+    Result<PageResult<ArticleVoForPre>> commonTags(SearchArticlesByTagIdDTO dto);
 }
