@@ -13,7 +13,7 @@ import java.util.List;
 public class TagController {
     @Autowired
     TagService tagService;
-    @PostMapping("/save/tagName")
+    @PostMapping("/save/{tagName}")
     public Result save(@PathVariable String tagName) {
         return tagService.save(tagName);
     }

@@ -80,26 +80,45 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Result<String> save(ArticleSaveDTO articleSaveDTO) {
-        Article article = new Article();
-        BeanUtils.copyProperties(articleSaveDTO, article);
-        article.setCreateTime(LocalDateTime.now());
-        article.setUpdateTime(LocalDateTime.now());
-        article.setViews(0);
-        Long userId = ThreadInfo.getThread();
-        article.setUserId(userId);
-        String author = userMapper.getNickNameById(userId);
-        article.setAuthor(author);
-        articleMapper.save(article);
-        Long articleId = article.getId();
         List<Long> tagIds = articleSaveDTO.getTagIds();
+
         if (tagIds != null && tagIds.size() > 0) {
             for (Long tagId : tagIds) {
-                tag2ArticlesMapper.insert(articleId,tagId); //tag和article映射表
+                Tag tag = tagMapper.getById(tagId);
+                if (tag == null) {
+                    return Result.error("不存在的标签");
+                }
             }
+
+
+            Long articleId = saveA(articleSaveDTO);
+            if (articleId != null) {
+                for (Long tagId : tagIds) {
+                    tag2ArticlesMapper.insert(articleId, tagId);
+                }
+            }
+
         }
 
         return Result.success();
     }
+    private Long saveA(ArticleSaveDTO articleSaveDTO){
+    Article article = new Article();
+            BeanUtils.copyProperties(articleSaveDTO, article);
+            article.setCreateTime(LocalDateTime.now());
+            article.setUpdateTime(LocalDateTime.now());
+            article.setViews(0);
+
+    Long userId = ThreadInfo.getThread();
+            article.setUserId(userId);
+
+    String author = userMapper.getNickNameById(userId);
+            article.setAuthor(author);
+
+            articleMapper.save(article);
+            return article.getId();
+    }
+
     @Override
     public Result<PageResult> getUsefulById(Integer pageNum) {
         PageHelper.startPage(pageNum, OtherConstants.pageSize);
@@ -245,5 +264,19 @@ public class ArticleServiceImpl implements ArticleService {
         pageResult.setTotal(articlesId.size());
         pageResult.setList(articleVoForPres);
         return Result.success(pageResult);
+    }
+
+    @Override
+    public Result<List<Tag>> getTagsByArticleId(Long articleId) {
+        List<Long> tagsId = tag2ArticlesMapper.getTagsIdByArticleId(articleId);
+        if (tagsId == null || tagsId.size() == 0) {
+            return Result.error("这篇文章没有标签或者查询文章不存在");
+        }
+        List<Tag> tagList = new ArrayList<>();
+        for (Long tagId : tagsId) {
+            Tag tag = tagMapper.getById(tagId);
+            tagList.add(tag);
+        }
+        return Result.success(tagList);
     }
 }

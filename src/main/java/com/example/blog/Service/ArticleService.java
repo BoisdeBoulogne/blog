@@ -33,4 +33,6 @@ public interface ArticleService {
     Result<PageResult<ArticleVoForPre>> getByKeyWord(KeyWordDTO keyword);
 
     Result<PageResult<ArticleVoForPre>> commonTags(SearchArticlesByTagIdDTO dto);
+
+    Result<List<Tag>> getTagsByArticleId(Long articleId);
 }

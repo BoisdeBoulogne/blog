@@ -57,4 +57,9 @@ public class ArticleController {
 
     }
 
+    @GetMapping("/tag/{articleId}")
+    public Result<List<Tag>> tag(@PathVariable Long articleId) {
+        return articleService.getTagsByArticleId(articleId);
+    }
+
 }

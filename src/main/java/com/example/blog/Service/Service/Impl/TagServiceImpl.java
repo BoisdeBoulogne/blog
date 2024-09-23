@@ -41,6 +41,7 @@ public class TagServiceImpl implements TagService {
         String jsonString = stringRedisTemplate.opsForValue().get(key);
         if (StrUtil.isNotBlank(jsonString)) {
             result = JSONUtil.toList(jsonString, Tag.class);
+            return result;
         }
         if (result != null) {
             return null;
