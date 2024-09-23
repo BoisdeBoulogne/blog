@@ -90,16 +90,13 @@ public class ArticleServiceImpl implements ArticleService {
                 }
             }
 
-
-            Long articleId = saveA(articleSaveDTO);
-            if (articleId != null) {
-                for (Long tagId : tagIds) {
-                    tag2ArticlesMapper.insert(articleId, tagId);
-                }
-            }
-
         }
-
+        Long articleId = saveA(articleSaveDTO);
+        if (tagIds != null) {
+            for (Long tagId : tagIds) {
+                tag2ArticlesMapper.insert(articleId, tagId);
+            }
+        }
         return Result.success();
     }
     private Long saveA(ArticleSaveDTO articleSaveDTO){
