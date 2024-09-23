@@ -9,6 +9,7 @@ import com.example.blog.Pojo.entity.Tag;
 import com.example.blog.Pojo.vo.ArticleVo;
 import com.example.blog.Pojo.vo.ArticleVoForPre;
 import com.example.blog.Service.ArticleService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class ArticleController {
         return articleService.getById(id);
     }
     @PostMapping("/save")
-    public Result<String> save(@RequestBody ArticleSaveDTO articleSaveDTO) {
+    public Result<String> save(@Valid @RequestBody ArticleSaveDTO articleSaveDTO) {
         return articleService.save(articleSaveDTO);
     }
 

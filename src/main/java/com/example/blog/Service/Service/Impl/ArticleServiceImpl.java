@@ -17,6 +17,7 @@ import com.example.blog.constants.OtherConstants;
 import com.example.blog.utils.ThreadInfo;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -29,6 +30,7 @@ import java.util.List;
 
 
 @Service
+@Slf4j
 public class ArticleServiceImpl implements ArticleService {
 
 
@@ -146,8 +148,10 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public Result<String> delete(Long id) {
         Long userId = ThreadInfo.getThread();
+
         Long realUserId = articleMapper.getUserIdByArticleId(id);
-        if (userId == null || userId .equals(realUserId)){
+        log.info("userId:{},realUserId:{}", userId, realUserId);
+        if (userId == null || (!userId .equals(realUserId))){
             return Result.error("没权限！");
         }
         String cacheKey = "cache:article:" + id;
