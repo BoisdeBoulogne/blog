@@ -83,7 +83,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public Result<String> save(ArticleSaveDTO articleSaveDTO) {
         List<Long> tagIds = articleSaveDTO.getTagIds();
-
+        articleSaveDTO.setContent(processArticleContent(articleSaveDTO.getContent()));
         if (tagIds != null && tagIds.size() > 0) {
             for (Long tagId : tagIds) {
                 Tag tag = tagMapper.getById(tagId);
@@ -100,6 +100,10 @@ public class ArticleServiceImpl implements ArticleService {
             }
         }
         return Result.success();
+    }
+    private String processArticleContent(String content) {
+        // 替换换行符为 JSON 兼容的 \n
+        return content.replace("\r\n", "\n").replace("\r", "\n");
     }
     private Long saveA(ArticleSaveDTO articleSaveDTO){
     Article article = new Article();
@@ -124,22 +128,19 @@ public class ArticleServiceImpl implements ArticleService {
         Long userId = ThreadInfo.getThread();
         Page<Article> page = articleMapper.getUsefulById(userId);
         List<Article> articles = page.getResult();
-        List<ArticleVo> articleVos = new ArrayList<>();
+        List<ArticleVoForPre> articleVos = new ArrayList<>();
         for (Article article : articles) {
-            ArticleVo articleVo = new ArticleVo();
+            ArticleVoForPre articleVo = new ArticleVoForPre();
             BeanUtils.copyProperties(article, articleVo);
-            articleVos.add(articleVo);
             List<Long> tagIds = tag2ArticlesMapper.getTagsIdByArticleId(article.getId());
             List<Tag> tags = new ArrayList<>();
             for (Long tagId : tagIds) {
                 Tag tag = tagMapper.getById(tagId);
                 tags.add(tag);
             }
-            ArticleVoForPre articleVoForPre = new ArticleVoForPre();
-            BeanUtils.copyProperties(article, articleVoForPre);
-            articleVoForPre.setTags(tags);
+            articleVo.setTags(tags);
         }
-        PageResult<ArticleVo> pageResult = new PageResult<ArticleVo>();
+        PageResult<ArticleVoForPre> pageResult = new PageResult<>();
         pageResult.setTotal(articles.size());
         pageResult.setList(articleVos);
         return Result.success(pageResult);

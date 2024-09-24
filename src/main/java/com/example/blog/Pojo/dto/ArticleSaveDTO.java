@@ -14,6 +14,5 @@ public class ArticleSaveDTO {
     @NotEmpty(message = "内容不能为空")
     private String content;
 
-    @NotNull(message = "标签ID列表不能为空")
     private List<Long> tagIds;
 }
