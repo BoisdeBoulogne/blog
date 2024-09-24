@@ -139,6 +139,7 @@ public class ArticleServiceImpl implements ArticleService {
                 tags.add(tag);
             }
             articleVo.setTags(tags);
+            articleVos.add(articleVo);
         }
         PageResult<ArticleVoForPre> pageResult = new PageResult<>();
         pageResult.setTotal(articles.size());
