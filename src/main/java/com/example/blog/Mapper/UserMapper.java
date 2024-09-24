@@ -23,11 +23,7 @@ public interface UserMapper {
 
     UserVo getVoById(Long id);
 
-    @Update("update user set following_count = following_count+1 where id = #{shootId}")
-    void shootAdd(Long shootId);
 
-    @Update("update user set follower_count = following_count+1 where id = #{targetId}")
-    void targetAdd(Long targetId);
 
     @Select("select nickname from user where id = #{userId}")
     String getNickNameById(Long userId);
@@ -46,4 +42,8 @@ public interface UserMapper {
     void resetPassword(UserResetPassword userResetPassword);
     @Select("select count(*) from user where nickname = #{nickname} or phone_number = #{phoneNumber} ")
     Integer checkSignIn(UserSignInDTO userSignInDTO);
+
+    void shootAddOrDelete(Long shootId, Integer add);
+
+    void targetAddOrDelete(Long targetId, Integer add);
 }

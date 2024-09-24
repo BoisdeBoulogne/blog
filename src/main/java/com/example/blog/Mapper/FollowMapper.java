@@ -18,9 +18,11 @@ public interface FollowMapper {
     @Select("select follower_id from follow where leader_id = #{currId}")
     List<Long> getLeadersById(Long currId);
 
-    @Select("select count(*) from follow where leader_id = #{targetId} and follower_id = #{shootId}")
-    Integer getCount(Long shootId, Long targetId);
+
 
     @Delete("delete from follow where follower_id = #{followId} and leader_id = #{targetId}")
     void delete(Long followId, Long targetId);
+
+    @Select("select count(*) from follow where follower_id = #{shootId} and leader_id = #{targetId}")
+    Integer getCount(Long shootId, Long targetId);
 }

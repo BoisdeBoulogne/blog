@@ -136,7 +136,7 @@ public class UserServiceImpl implements UserService {
         String code = userResetPassword.getCode();
         String realCode = stringRedisTemplate.opsForValue().get("code:"+ phoneNumber);
         if (code ==null || realCode == null || !code.equals(realCode)) {
-            return Result.error("总之出现错误");
+            return Result.error("验证码出现错误");
         }
         userMapper.resetPassword(userResetPassword);
         return Result.success();
@@ -158,9 +158,9 @@ public class UserServiceImpl implements UserService {
             return Result.error("已关注");
         }
         log.info("目标关注用户id: {}",targetId);
-        userMapper.shootAdd(shootId);
-        userMapper.targetAdd(targetId);
-        followMapper.insert(targetId,shootId);
+        userMapper.shootAddOrDelete(shootId,OtherConstants.add);
+        userMapper.targetAddOrDelete(targetId,OtherConstants.add);
+        followMapper.insert(shootId,targetId);
         return Result.success();
     }
 
@@ -179,6 +179,8 @@ public class UserServiceImpl implements UserService {
             return Result.error("未关注");
         }
         followMapper.delete(followId,targetId);
+        userMapper.shootAddOrDelete(followId,OtherConstants.delete);
+        userMapper.targetAddOrDelete(targetId,OtherConstants.delete);
         return Result.success();
     }
 
@@ -222,7 +224,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result<String> collect(Long articleId) {
-        ThreadInfo.setThread(2L);
         Long userId = ThreadInfo.getThread();
         int count = collectMapper.getCount(userId,articleId);
         if (count != 0){
@@ -240,6 +241,7 @@ public class UserServiceImpl implements UserService {
         if (count == 0){
             return Result.error("没有收藏过");
         }
+        articleMapper.likeOrCollect(articleId,OtherConstants.collects,OtherConstants.delete);
         collectMapper.delete(userId,articleId);
         return Result.success();
     }
@@ -300,6 +302,7 @@ public class UserServiceImpl implements UserService {
         }
         likeMapper.insert(articleId,userId);
         articleMapper.likeOrCollect(articleId,OtherConstants.likes,OtherConstants.add);
+        log.info(articleId.toString(),OtherConstants.likes.toString(),OtherConstants.add.toString());
         return Result.success();
     }
 

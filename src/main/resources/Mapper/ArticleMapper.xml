@@ -40,10 +40,10 @@
     <update id="likeOrCollect">
         update articles
         <set>
-            <if test="collects = 1">
+            <if test="collects == 1">
                 collects = collects + #{howMany}
             </if>
-            <if test="collects = 0">
+            <if test="collects == 0">
                 likes = likes + #{howMany}
             </if>
         </set>

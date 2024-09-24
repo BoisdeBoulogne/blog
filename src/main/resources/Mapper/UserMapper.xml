@@ -8,4 +8,22 @@
     <insert id="insert">
         insert into user (password, nickname, avatar_url,phone_number) values (#{password},#{nickname},#{avatarUrl},#{phoneNumber})
     </insert>
+
+    <update id="targetAddOrDelete">
+    update user
+    <set>
+            follower_count = follower_count + #{add}
+    </set>
+    where id = #{targetId}
+    </update>
+
+    <update id="shootAddOrDelete">
+        update user
+        <set>
+            following_count = following_count + #{add}
+        </set>
+        where id = #{shootId}
+    </update>
 </mapper>
+
+
