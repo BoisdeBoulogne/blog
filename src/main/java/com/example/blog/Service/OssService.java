@@ -26,7 +26,7 @@ public class OssService {
             InputStream inputStream = file.getInputStream();
 
             // 生成文件名，使用UUID确保文件名的唯一性
-            String fileName = UUID.randomUUID().toString().replace("-", "") + file.getOriginalFilename();
+            String fileName = UUID.randomUUID().toString().replace("-", "") + file.getOriginalFilename().replace(" ","");
 
             // 上传文件到 OSS
             ossClient.putObject(bucketName, fileName, inputStream);

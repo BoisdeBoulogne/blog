@@ -41,4 +41,7 @@ public interface ArticleMapper {
 
     @Select("select count(*) from articles where id = #{id}")
     Integer getCountById(Long id);
+
+    @Select("select count(*) from articles")
+    Integer getAllCount();
 }

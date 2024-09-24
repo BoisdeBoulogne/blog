@@ -10,6 +10,7 @@ import com.example.blog.Service.UserService;
 import com.example.blog.utils.ThreadInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/user")
@@ -108,7 +109,11 @@ public class UserController {
         return Result.success();
     }
 
-
+    @PostMapping("/updateImg/{imgUrl}")
+    public Result<String> updateImg(@PathVariable String imgUrl) {
+        userService.updateImg(imgUrl);
+        return Result.success();
+    }
 
 
 }

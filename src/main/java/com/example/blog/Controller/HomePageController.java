@@ -4,12 +4,10 @@ import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.dto.KeyWordDTO;
 import com.example.blog.Pojo.vo.ArticleVoForPre;
+import com.example.blog.Pojo.vo.HomePageVo;
 import com.example.blog.Service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,10 +18,9 @@ public class HomePageController {
     ArticleService articleService;
 
     //主页数据
-    @GetMapping()
-    public Result<List<ArticleVoForPre>> getHotArticles() {
-        List<ArticleVoForPre> articles = articleService.forHomePage();
-        return Result.success(articles);
+    @GetMapping("/{pageNum}")
+    public Result<HomePageVo> getHotArticles(@PathVariable int pageNum) {
+        return articleService.forHomePage(pageNum);
     }
 
     @GetMapping("/keyWord")

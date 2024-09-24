@@ -12,6 +12,7 @@ import com.example.blog.Pojo.entity.Tag;
 import com.example.blog.Pojo.vo.ArticleVo;
 import com.example.blog.Pojo.vo.ArticleVoForPre;
 import com.example.blog.Pojo.vo.CommentVo;
+import com.example.blog.Pojo.vo.HomePageVo;
 import com.example.blog.Service.ArticleService;
 import com.example.blog.constants.OtherConstants;
 import com.example.blog.utils.ThreadInfo;
@@ -185,23 +186,25 @@ public class ArticleServiceImpl implements ArticleService {
         article1.setContent(article.getContent());
         article1.setTitle(article.getTitle());//三个更新字段
         List<Long> tags = article.getTagIds();
+        tag2ArticlesMapper.deleteByArticleId(id);
         if (tags != null) {
-            tag2ArticlesMapper.deleteByArticleId(id);
             for (Long tagId : tags) {
                 tag2ArticlesMapper.insert(id,tagId);
             }
         }
 
-        BeanUtils.copyProperties(article, article1);
-
+        articleMapper.update(article1);
         return Result.success();
     }
 
     @Override
-    public List<ArticleVoForPre> forHomePage() {
-        PageHelper.startPage(1,OtherConstants.pageSize);
-        List<Long> articlesId = articleMapper.forHomePage();
+    public Result<HomePageVo> forHomePage(int pageNum) {
+        PageHelper.startPage(pageNum,5);
         List<ArticleVoForPre> articleVos = new ArrayList<>();
+        List<Long> articlesId = articleMapper.forHomePage();
+        Integer count = articleMapper.getAllCount();
+
+
         for (Long articleId : articlesId) {
             Article article = articleMapper.getById(articleId);
             ArticleVoForPre articleVoForPre = new ArticleVoForPre();
@@ -215,7 +218,10 @@ public class ArticleServiceImpl implements ArticleService {
             articleVoForPre.setTags(tagList);
             articleVos.add(articleVoForPre);
         }
-        return articleVos;
+        HomePageVo homePageVo = new HomePageVo();
+        homePageVo.setAll(count);
+        homePageVo.setList(articleVos);
+        return Result.success(homePageVo);
     }
 
     @Override

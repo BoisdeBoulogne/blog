@@ -39,4 +39,6 @@ public interface UserService {
     Result<String> loginByPhoneNumber(UserLoginByPhoneNumberDTO userLoginByPhoneNumberDTO);
 
     Result<String> resetPassword(UserResetPassword userResetPassword);
+
+    void updateImg(String imgUrl);
 }

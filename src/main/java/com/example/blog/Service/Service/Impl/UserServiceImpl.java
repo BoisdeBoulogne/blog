@@ -337,4 +337,10 @@ public class UserServiceImpl implements UserService {
         Integer randomInt = 100000+ random.nextInt(999999);
         return String.valueOf(randomInt);
     }
+
+    @Override
+    public void updateImg(String imgUrl) {
+        Long userId = ThreadInfo.getThread();
+        userMapper.updateImg(imgUrl,userId);
+    }
 }

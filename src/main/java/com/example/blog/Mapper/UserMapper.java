@@ -5,7 +5,6 @@ import com.example.blog.Pojo.dto.UserResetPassword;
 import com.example.blog.Pojo.dto.UserSignInDTO;
 import com.example.blog.Pojo.entity.User;
 import com.example.blog.Pojo.vo.UserVo;
-import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -46,4 +45,7 @@ public interface UserMapper {
     void shootAddOrDelete(Long shootId, Integer add);
 
     void targetAddOrDelete(Long targetId, Integer add);
+
+    @Update("update user set avatar_url = #{imgUrl} where id = #{userId} " )
+    void updateImg(String imgUrl, Long userId);
 }
