@@ -21,11 +21,11 @@ public interface ArticleService {
 
     Result<String> delete(Long id);
 
-    void update(Article article);
 
 
 
-    void updateWithId(ArticleSaveDTO article, Long id);
+
+    Result<String> updateWithId(ArticleSaveDTO article, Long id);
 
 
     List<ArticleVoForPre> forHomePage();

@@ -16,8 +16,11 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/user/**")
                 .excludePathPatterns("/user/code/*", "/user/signIn", "/user/login", "/user/loginByPhoneNumber", "/user/resetPassword")
-                .addPathPatterns("/article/save", "/article/deleteOrUpdatePage/*", "/article/delete/*", "/article/update");
+                .addPathPatterns("/article/save", "/article/deleteOrUpdatePage/*", "/article/delete/*", "/article/update")
+                .addPathPatterns("/article/*")
+                .excludePathPatterns("/article/commonTags");
     }
+
 
     /*@Override
     public void addCorsMappings(CorsRegistry registry) {

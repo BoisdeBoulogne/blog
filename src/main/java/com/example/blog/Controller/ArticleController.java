@@ -1,5 +1,6 @@
 package com.example.blog.Controller;
 
+import com.example.blog.Mapper.ArticleMapper;
 import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.dto.ArticleSaveDTO;
@@ -24,6 +25,8 @@ import java.util.List;
 public class ArticleController {
     @Autowired
     private ArticleService articleService;
+    @Autowired
+    private ArticleMapper articleMapper;
 
     @GetMapping("/{id}")
     public Result<ArticleVo> getArticle(@PathVariable Long id) {
@@ -47,11 +50,10 @@ public class ArticleController {
     @PutMapping("/update/{id}")
     public Result<String> update(@RequestBody ArticleSaveDTO article, @PathVariable Long id) {
 
-        articleService.updateWithId(article,id);
-        return Result.success();
+        return articleService.updateWithId(article,id);
     }
 
-    @GetMapping("/commonTags")
+    @PostMapping ("/commonTags")
     public Result<PageResult<ArticleVoForPre>> commonTags(@RequestBody SearchArticlesByTagIdDTO dto) {
         log.info(dto.toString());
         return articleService.commonTags(dto);
@@ -62,5 +64,7 @@ public class ArticleController {
     public Result<List<Tag>> tag(@PathVariable Long articleId) {
         return articleService.getTagsByArticleId(articleId);
     }
+
+
 
 }

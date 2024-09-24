@@ -38,4 +38,7 @@ public interface ArticleMapper {
 
     @Update("update articles set views = views + 1 where id = #{id}")
     void addViews(Long id);
+
+    @Select("select count(*) from articles where id = #{id}")
+    Integer getCountById(Long id);
 }

@@ -191,8 +191,6 @@ public class UserServiceImpl implements UserService {
 
         PageHelper.startPage(pageNum,OtherConstants.pageSize);
 
-
-
         List<Long> fansId = followMapper.getFansById(currId);
         List<UserVo> users = new ArrayList<>();
         for (Long id : fansId){

@@ -1,5 +1,6 @@
 package com.example.blog.Mapper;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -17,4 +18,6 @@ public interface HistoryMapper {
     @Select("select articles_id from history where user_id = #{currId} order by view_time desc")
     List<Long> getArticleIdsByUserId(Long currId);
 
+    @Delete("delete from history where articles_id = #{id}")
+    void deleteByArticleId(Long id);
 }

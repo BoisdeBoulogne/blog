@@ -156,21 +156,30 @@ public class ArticleServiceImpl implements ArticleService {
         if (userId == null || (!userId .equals(realUserId))){
             return Result.error("没权限！");
         }
-        String cacheKey = "cache:article:" + id;
+        historyMapper.deleteByArticleId(id);
         articleMapper.deleteById(id);
-        stringRedisTemplate.delete(cacheKey);
         return Result.success();
     }
 
-    @Override
-    public void update(Article article) {
-        article.setUpdateTime(LocalDateTime.now());
-        articleMapper.update(article);
-    }
 
 
     @Override
-    public void updateWithId(ArticleSaveDTO article, Long id) {
+    public Result<String> updateWithId(ArticleSaveDTO article, Long id) {
+        Integer many = count(id);
+        if (many == 0){
+            return Result.error("不存在的文章");
+        }
+        for (Long tagId : article.getTagIds()) {
+            Tag tag = tagMapper.getById(tagId);
+            if (tag == null) {
+                return Result.error("不存在的标签");
+            }
+        }
+        Long userId = ThreadInfo.getThread();
+        Long realUserId = articleMapper.getUserIdByArticleId(id);
+        if (userId == null || (!userId .equals(realUserId))){
+            return Result.error("没权限");
+        }
         Article article1 = articleMapper.getById(id);
         article1.setUpdateTime(LocalDateTime.now());
         article1.setContent(article.getContent());
@@ -184,9 +193,8 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         BeanUtils.copyProperties(article, article1);
-        articleMapper.update(article1);
-        String cacheKey = "cache:article:" + id;
-        stringRedisTemplate.delete(cacheKey);
+
+        return Result.success();
     }
 
     @Override
@@ -281,5 +289,8 @@ public class ArticleServiceImpl implements ArticleService {
             tagList.add(tag);
         }
         return Result.success(tagList);
+    }
+    private Integer count(Long id) {
+        return articleMapper.getCountById(id);
     }
 }
