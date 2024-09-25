@@ -159,6 +159,7 @@ public class ArticleServiceImpl implements ArticleService {
         }
         historyMapper.deleteByArticleId(id);
         articleMapper.deleteById(id);
+        tag2ArticlesMapper.deleteByArticleId(id);
         return Result.success();
     }
 

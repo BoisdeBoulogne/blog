@@ -23,4 +23,7 @@ public interface Tag2ArticlesMapper {
 
     @Select("select articles_id from tag2articles where tag_id = #{tagId}")
     List<Long> getArticlesIdByTagId(Long tagId);
+
+    @Select("select count(*) from tag2articles where tag_id = #{id}")
+    Integer getCountByTagId(Long id);
 }

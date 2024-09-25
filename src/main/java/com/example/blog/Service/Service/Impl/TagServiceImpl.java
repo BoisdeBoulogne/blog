@@ -3,9 +3,11 @@ package com.example.blog.Service.Service.Impl;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.example.blog.Mapper.Tag2ArticlesMapper;
 import com.example.blog.Mapper.TagMapper;
 import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.entity.Tag;
+import com.example.blog.Pojo.vo.TagVo;
 import com.example.blog.Service.TagService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -21,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 public class TagServiceImpl implements TagService {
     @Autowired
     private TagMapper tagMapper;
+    @Autowired
+    private Tag2ArticlesMapper tag2ArticlesMapper;
     @Autowired
     StringRedisTemplate stringRedisTemplate;
     private final String key = "tags";
@@ -36,11 +41,11 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<Tag> getAllTags() {
-        List<Tag> result = null;
+    public List<TagVo> getAllTags() {
+        List<TagVo> result = null;
         String jsonString = stringRedisTemplate.opsForValue().get(key);
         if (StrUtil.isNotBlank(jsonString)) {
-            result = JSONUtil.toList(jsonString, Tag.class);
+            result = JSONUtil.toList(jsonString, TagVo.class);
             return result;
         }
         if (result != null) {
@@ -55,13 +60,23 @@ public class TagServiceImpl implements TagService {
                     return getAllTags();
                 }
                 List<Tag> tags = tagMapper.getAllTags();
+
                 if (tags == null || tags.size() == 0) {
                     stringRedisTemplate.opsForValue().set(key,"", 5, TimeUnit.MINUTES);
                     return null;
                 }
-                log.info(JSONUtil.toJsonStr(tags));
-                stringRedisTemplate.opsForValue().set(key,JSONUtil.toJsonStr(tags), 30, TimeUnit.MINUTES);
-                return tags;
+                List<TagVo> tagVos = new ArrayList<>();
+                for (Tag tag : tags) {
+                    Integer count = tag2ArticlesMapper.getCountByTagId(tag.getId());
+                    TagVo tagVo = new TagVo();
+                    tagVo.setTagName(tag.getTagName());
+                    tagVo.setId(tag.getId());
+                    tagVo.setCount(count);
+                    tagVos.add(tagVo);
+                }
+                log.info(JSONUtil.toJsonStr(tagVos));
+                stringRedisTemplate.opsForValue().set(key,JSONUtil.toJsonStr(tagVos), 30, TimeUnit.MINUTES);
+                return tagVos;
             }catch (Exception e){
                 e.printStackTrace();
             }

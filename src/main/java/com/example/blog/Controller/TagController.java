@@ -2,6 +2,7 @@ package com.example.blog.Controller;
 
 import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.entity.Tag;
+import com.example.blog.Pojo.vo.TagVo;
 import com.example.blog.Service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +19,8 @@ public class TagController {
         return tagService.save(tagName);
     }
     @GetMapping("/all")
-    public Result<List<Tag>> getAllTags(){
-        List<Tag> tags = tagService.getAllTags();
+    public Result<List<TagVo>> getAllTags(){
+        List<TagVo> tags = tagService.getAllTags();
         if(tags==null){
             return Result.error("暂时没有标签");
         }
