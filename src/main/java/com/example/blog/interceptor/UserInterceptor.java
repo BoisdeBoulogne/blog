@@ -34,10 +34,9 @@ public class UserInterceptor implements HandlerInterceptor {
                 } catch (Exception e) {
                     log.error("JWT parsing failed", e);
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    return false;  // token 解析失败，返回401
+                    return true;  // token 解析失败，返回401
                 }
             }
-
             return true;  // 没有 token 或 token 解析成功，允许匿名访问
         }
 
