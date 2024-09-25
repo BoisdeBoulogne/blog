@@ -6,6 +6,6 @@ import java.util.List;
 
 @Data
 public class HomePageVo {
-    private List<ArticleVoForPre> list;
+    private List<ArticleVoForHomePage> list;
     private Integer all;
 }

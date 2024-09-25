@@ -9,10 +9,7 @@ import com.example.blog.Pojo.dto.KeyWordDTO;
 import com.example.blog.Pojo.dto.SearchArticlesByTagIdDTO;
 import com.example.blog.Pojo.entity.Article;
 import com.example.blog.Pojo.entity.Tag;
-import com.example.blog.Pojo.vo.ArticleVo;
-import com.example.blog.Pojo.vo.ArticleVoForPre;
-import com.example.blog.Pojo.vo.CommentVo;
-import com.example.blog.Pojo.vo.HomePageVo;
+import com.example.blog.Pojo.vo.*;
 import com.example.blog.Service.ArticleService;
 import com.example.blog.constants.OtherConstants;
 import com.example.blog.utils.ThreadInfo;
@@ -201,15 +198,17 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public Result<HomePageVo> forHomePage(int pageNum) {
         PageHelper.startPage(pageNum,5);
-        List<ArticleVoForPre> articleVos = new ArrayList<>();
+        List<ArticleVoForHomePage> articleVos = new ArrayList<>();
         List<Long> articlesId = articleMapper.forHomePage();
         Integer count = articleMapper.getAllCount();
 
-
         for (Long articleId : articlesId) {
             Article article = articleMapper.getById(articleId);
-            ArticleVoForPre articleVoForPre = new ArticleVoForPre();
+            String content = article.getContent();
+
+            ArticleVoForHomePage articleVoForPre = new ArticleVoForHomePage();
             BeanUtils.copyProperties(article, articleVoForPre);
+            articleVoForPre.setContent(content);
             List<Long> tags = tag2ArticlesMapper.getTagsIdByArticleId(articleId);
             List<Tag> tagList = new ArrayList<>();
             for (Long tagId : tags) {
