@@ -14,14 +14,14 @@ import java.util.Map;
 public class JwtToken {
 
 
-    private String secretKey = JwtConstants.JWT_SECRET;
-    private long validityInMilliseconds = 3600000; // 1小时
+    private  String secretKey = JwtConstants.JWT_SECRET;
+    private long validityInMilliseconds = 7200000; // 2小时
 
     // 生成JWT Token
     public String createToken(Map<String, Object> claims) {
         // 设置声明
         Claims jwtClaims = Jwts.claims();
-        jwtClaims.putAll(claims); // 将额外的声明信息放入claims
+        jwtClaims.putAll(claims);
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);

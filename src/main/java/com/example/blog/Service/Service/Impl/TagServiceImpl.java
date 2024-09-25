@@ -42,60 +42,23 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public List<TagVo> getAllTags() {
-        List<TagVo> result = null;
-        String jsonString = stringRedisTemplate.opsForValue().get(key);
-        if (StrUtil.isNotBlank(jsonString)) {
-            result = JSONUtil.toList(jsonString, TagVo.class);
-            return result;
-        }
-        if (result != null) {
-            return null;
-        }
-        if (jsonString == null) {
 
-            try {
-                boolean lock = tryLock("tagLock");
-                if (!lock){
-                    Thread.sleep(50);
-                    return getAllTags();
-                }
-                List<Tag> tags = tagMapper.getAllTags();
 
-                if (tags == null || tags.size() == 0) {
-                    stringRedisTemplate.opsForValue().set(key,"", 5, TimeUnit.MINUTES);
-                    return null;
-                }
-                List<TagVo> tagVos = new ArrayList<>();
-                for (Tag tag : tags) {
-                    Integer count = tag2ArticlesMapper.getCountByTagId(tag.getId());
-                    TagVo tagVo = new TagVo();
-                    tagVo.setTagName(tag.getTagName());
-                    tagVo.setId(tag.getId());
-                    tagVo.setCount(count);
-                    tagVos.add(tagVo);
-                }
-                log.info(JSONUtil.toJsonStr(tagVos));
-                stringRedisTemplate.opsForValue().set(key,JSONUtil.toJsonStr(tagVos), 30, TimeUnit.MINUTES);
-                return tagVos;
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            finally {
-                unlock("tagLock");
-            }
+        List<Tag> tags = tagMapper.getAllTags();
 
+        List<TagVo> tagVos = new ArrayList<>();
+        for (Tag tag : tags) {
+            Integer count = tag2ArticlesMapper.getCountByTagId(tag.getId());
+            TagVo tagVo = new TagVo();
+            tagVo.setTagName(tag.getTagName());
+            tagVo.setId(tag.getId());
+            tagVo.setCount(count);
+            tagVos.add(tagVo);
         }
 
+        return tagVos;
 
-        return result;
     }
 
-    private boolean tryLock(String key2){
-        Boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(key2,"1",30,TimeUnit.SECONDS);
-        return BooleanUtil.isTrue(flag);
-    }
 
-    private void unlock(String key2){
-        stringRedisTemplate.delete(key2);
-    }
 }
