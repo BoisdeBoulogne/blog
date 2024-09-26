@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -55,15 +57,15 @@ public class UserController {
         return userService.removeFollow(targetUserId);
     }
     //查看自己粉丝 文档完成
-    @GetMapping("/myFans/{pageNum}")
-    public Result<PageResult<UserVo>> getMyFans(@PathVariable int pageNum) {
-        PageResult<UserVo> page = userService.getMyFans(pageNum);
+    @GetMapping("/myFans")
+    public Result<List<UserVo>> getMyFans() {
+        List<UserVo> page = userService.getMyFans();
         return Result.success(page);
     }
     //关注列表 文档完成
-    @GetMapping("/myLeaders/{pageNum}")
-    public Result<PageResult<UserVo>> getMyLeader(@PathVariable int pageNum) {
-        PageResult<UserVo> page = userService.getMyLeaders(pageNum);
+    @GetMapping("/myLeaders")
+    public Result<List<UserVo>> getMyLeader() {
+        List<UserVo> page = userService.getMyLeaders();
         return Result.success(page);
     }
 

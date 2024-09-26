@@ -185,11 +185,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageResult<UserVo> getMyFans(int pageNum) {
+    public List<UserVo> getMyFans() {
 
         Long currId = ThreadInfo.getThread();
-
-        PageHelper.startPage(pageNum,OtherConstants.pageSize);
 
         List<Long> fansId = followMapper.getFansById(currId);
         List<UserVo> users = new ArrayList<>();
@@ -197,14 +195,10 @@ public class UserServiceImpl implements UserService {
             UserVo userVo = userMapper.getVoById(id);
             users.add(userVo);
         }
-        PageResult<UserVo> pageResult = new PageResult<>();
-        pageResult.setTotal(users.size());
-        pageResult.setList(users);
-        return pageResult;
+        return users;
     }
     @Override
-    public PageResult<UserVo> getMyLeaders(int pageNum){
-        PageHelper.startPage(pageNum,OtherConstants.pageSize);
+    public List<UserVo> getMyLeaders(){
         Long currId = ThreadInfo.getThread();
         List<Long> leadersId = followMapper.getLeadersById(currId);
         List<UserVo> users = new ArrayList<>();
@@ -212,10 +206,7 @@ public class UserServiceImpl implements UserService {
             UserVo userVo = userMapper.getVoById(id);
             users.add(userVo);
         }
-        PageResult<UserVo> pageResult = new PageResult<>();
-        pageResult.setTotal(users.size());
-        pageResult.setList(users);
-        return pageResult;
+        return users;
     }
 
 

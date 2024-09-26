@@ -6,12 +6,14 @@ import com.example.blog.Pojo.dto.*;
 import com.example.blog.Pojo.vo.ArticleVoForPre;
 import com.example.blog.Pojo.vo.UserVo;
 
+import java.util.List;
+
 public interface UserService {
     Result<String> login(UserLoginDTO userLogin);
 
     Result<String> follow(Long targetUserId);
 
-    PageResult getMyFans(int pageNum);
+    List<UserVo> getMyFans();
 
 
     Result<String> collect(Long articleId);
@@ -24,7 +26,7 @@ public interface UserService {
 
     Result<String> removeLike(Long articleId);
 
-    PageResult<UserVo> getMyLeaders(int pageNum);
+    List<UserVo> getMyLeaders();
 
     Result<String> removeCollect(Long articleId);
 
