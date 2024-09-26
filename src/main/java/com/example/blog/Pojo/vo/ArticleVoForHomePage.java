@@ -17,4 +17,5 @@ public class ArticleVoForHomePage {
     private Integer likes;
     private Integer collects;
     private String content;
+    private String userImg;
 }

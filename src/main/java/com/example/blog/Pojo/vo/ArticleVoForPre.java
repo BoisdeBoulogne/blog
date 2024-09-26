@@ -17,4 +17,5 @@ public class ArticleVoForPre {
     private Integer views;
     private Integer likes;
     private Integer collects;
+    private String userImg;
 }

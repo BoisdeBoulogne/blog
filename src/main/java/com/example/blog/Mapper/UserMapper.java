@@ -48,4 +48,7 @@ public interface UserMapper {
 
     @Update("update user set avatar_url = #{imgUrl} where id = #{userId} " )
     void updateImg(String imgUrl, Long userId);
+
+    @Select("select avatar_url from  user where id = #{userId}")
+    String getImgById(Long userId);
 }

@@ -33,7 +33,6 @@ public class UserInterceptor implements HandlerInterceptor {
                     ThreadInfo.setThread(userId);  // 将用户信息保存到 ThreadLocal 中
                 } catch (Exception e) {
                     log.error("JWT parsing failed", e);
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     return true;  // token 解析失败，返回401
                 }
             }

@@ -131,12 +131,14 @@ public class ArticleServiceImpl implements ArticleService {
             ArticleVoForPre articleVo = new ArticleVoForPre();
             BeanUtils.copyProperties(article, articleVo);
             List<Long> tagIds = tag2ArticlesMapper.getTagsIdByArticleId(article.getId());
+            String userImg = userMapper.getImgById(userId);
             List<Tag> tags = new ArrayList<>();
             for (Long tagId : tagIds) {
                 Tag tag = tagMapper.getById(tagId);
                 tags.add(tag);
             }
             articleVo.setTags(tags);
+            articleVo.setUserImg(userImg);
             articleVos.add(articleVo);
         }
         PageResult<ArticleVoForPre> pageResult = new PageResult<>();
@@ -205,10 +207,12 @@ public class ArticleServiceImpl implements ArticleService {
         for (Long articleId : articlesId) {
             Article article = articleMapper.getById(articleId);
             String content = article.getContent();
-
+            Long userId = article.getUserId();
+            String userImg = userMapper.getImgById(userId);
             ArticleVoForHomePage articleVoForPre = new ArticleVoForHomePage();
             BeanUtils.copyProperties(article, articleVoForPre);
             articleVoForPre.setContent(content);
+            articleVoForPre.setUserImg(userImg);
             List<Long> tags = tag2ArticlesMapper.getTagsIdByArticleId(articleId);
             List<Tag> tagList = new ArrayList<>();
             for (Long tagId : tags) {
@@ -234,6 +238,8 @@ public class ArticleServiceImpl implements ArticleService {
         List<ArticleVoForPre> articleVos = new ArrayList<>();
         for (Long articleId : articlesId) {
             Article article = articleMapper.getById(articleId);
+            Long userId = article.getUserId();
+            String userImg = userMapper.getImgById(userId);
             ArticleVoForPre articleVoForPre = new ArticleVoForPre();
             BeanUtils.copyProperties(article, articleVoForPre);
             List<Long> tags = tag2ArticlesMapper.getTagsIdByArticleId(articleId);
@@ -243,6 +249,7 @@ public class ArticleServiceImpl implements ArticleService {
                 tagList.add(tag);
             }
             articleVoForPre.setTags(tagList);
+            articleVoForPre.setUserImg(userImg);
             articleVos.add(articleVoForPre);
         }
         PageResult pageResult = new PageResult();
@@ -253,12 +260,14 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Result<PageResult<ArticleVoForPre>> commonTags(SearchArticlesByTagIdDTO dto) {
-        PageHelper.startPage(dto.getPageNum(),OtherConstants.pageSize);
-        List<Long> articlesId = tag2ArticlesMapper.getArticlesIdByTagId(dto.getTagId());
         Tag tag1 = tagMapper.getById(dto.getTagId());
         if (tag1 == null){
             return Result.error("不存在的标签");
         }
+        PageHelper.startPage(dto.getPageNum(),OtherConstants.pageSize);
+        List<Long> articlesId = tag2ArticlesMapper.getArticlesIdByTagId(dto.getTagId());
+
+
         if (articlesId == null || articlesId.size() == 0) {
             return Result.error("还不存在相关文章");
         }
@@ -274,6 +283,9 @@ public class ArticleServiceImpl implements ArticleService {
                 tagList.add(tag);
 
             }
+            Long userId = article.getUserId();
+            String userImg = userMapper.getImgById(userId);
+            articleVoForPre.setUserImg(userImg);
             articleVoForPre.setTags(tagList);
             articleVoForPres.add(articleVoForPre);
         }
