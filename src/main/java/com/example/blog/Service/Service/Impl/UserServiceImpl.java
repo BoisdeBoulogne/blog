@@ -8,6 +8,7 @@ import com.example.blog.Pojo.entity.Comments;
 import com.example.blog.Pojo.entity.Tag;
 import com.example.blog.Pojo.entity.User;
 import com.example.blog.Pojo.vo.ArticleVoForPre;
+import com.example.blog.Pojo.vo.UserSpaceVO;
 import com.example.blog.Pojo.vo.UserVo;
 import com.example.blog.Service.UserService;
 import com.example.blog.constants.OtherConstants;
@@ -93,7 +94,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result<String> login(UserLoginDTO userLogin) {
+    public Result<LoginReturnDTO> login(UserLoginDTO userLogin) {
 
         User user = userMapper.login(userLogin);
         if (user == null) {
@@ -101,15 +102,22 @@ public class UserServiceImpl implements UserService {
         }
         //比对账号，密码
         //jwt来验证
+
         Map<String,Object> claims = new HashMap<>();
         claims.put("userId", user.getId());//Jwt使用账号来标明是哪个用户
         String token = jwtToken.createToken(claims);
-
-        return Result.success(token);
+        Result result = new Result();
+        result.setMsg(token);
+        LoginReturnDTO loginReturnDTO = new LoginReturnDTO();
+        loginReturnDTO.setUserName(user.getNickname());
+        loginReturnDTO.setPhoneNumber(user.getPhoneNumber());
+        loginReturnDTO.setAvatarUrl(user.getAvatarUrl());
+        result.setData(loginReturnDTO);
+        return result;
     }
 
     @Override
-    public Result<String> loginByPhoneNumber(UserLoginByPhoneNumberDTO userLoginByPhoneNumberDTO) {
+    public Result<LoginReturnDTO> loginByPhoneNumber(UserLoginByPhoneNumberDTO userLoginByPhoneNumberDTO) {
         String phoneNumber = userLoginByPhoneNumberDTO.getPhoneNumber();
         int count = userMapper.getByPhoneNumber(phoneNumber);
         if (count == 0 ){
@@ -119,11 +127,20 @@ public class UserServiceImpl implements UserService {
         if (realCode == null || !realCode.equals(userLoginByPhoneNumberDTO.getCode())) {
             return Result.error("未发送验证码或验证码错误");
         }
+
         Long userId = userMapper.getIdByPhoneNumber(phoneNumber);
+        User user = userMapper.getById(userId);
         Map<String,Object> claims = new HashMap<>();
         claims.put("userId", userId);//Jwt使用账号来标明是哪个用户
         String token = jwtToken.createToken(claims);
-        return Result.success(token);
+        Result result = new Result<>();
+        result.setMsg(token);
+        LoginReturnDTO loginReturnDTO = new LoginReturnDTO();
+        loginReturnDTO.setPhoneNumber(user.getPhoneNumber());
+        loginReturnDTO.setAvatarUrl(user.getAvatarUrl());
+        loginReturnDTO.setUserName(user.getNickname());
+        result.setData(loginReturnDTO);
+        return result;
     }
 
     @Override
@@ -333,5 +350,16 @@ public class UserServiceImpl implements UserService {
     public void updateImg(String imgUrl) {
         Long userId = ThreadInfo.getThread();
         userMapper.updateImg(imgUrl,userId);
+    }
+
+    @Override
+    public Result<UserSpaceVO> userSpace() {
+        Long userId = ThreadInfo.getThread();
+        User user = userMapper.getById(userId);
+        UserSpaceVO userSpaceVO = new UserSpaceVO();
+        BeanUtils.copyProperties(user,userSpaceVO);
+        Integer collectCount = collectMapper.getCountByUserId(userId);
+        userSpaceVO.setCollectionCount(collectCount);
+        return Result.success(userSpaceVO);
     }
 }

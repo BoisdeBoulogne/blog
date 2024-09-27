@@ -5,6 +5,7 @@ import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.dto.*;
 
 import com.example.blog.Pojo.vo.ArticleVoForPre;
+import com.example.blog.Pojo.vo.UserSpaceVO;
 import com.example.blog.Pojo.vo.UserVo;
 import com.example.blog.Service.UserService;
 import com.example.blog.utils.ThreadInfo;
@@ -32,12 +33,12 @@ public class UserController {
     }
     //手机号验证码登录 文档完成
     @PostMapping("loginByPhoneNumber")
-    public Result<String> loginByPhoneNumber(@RequestBody UserLoginByPhoneNumberDTO userLoginByPhoneNumberDTO) {
+    public Result<LoginReturnDTO> loginByPhoneNumber(@RequestBody UserLoginByPhoneNumberDTO userLoginByPhoneNumberDTO) {
         return userService.loginByPhoneNumber(userLoginByPhoneNumberDTO);
     }
     //账号密码登录 文档完成
     @PostMapping("/login")
-    public Result<String> login(@RequestBody UserLoginDTO userLoginDTO) {
+    public Result<LoginReturnDTO> login(@RequestBody UserLoginDTO userLoginDTO) {
         return userService.login(userLoginDTO);
     }
     //重置密码 文档完成
@@ -111,10 +112,15 @@ public class UserController {
         return Result.success();
     }
 
-    @PostMapping("/updateImg/{imgUrl}")
-    public Result<String> updateImg(@PathVariable String imgUrl) {
-        userService.updateImg(imgUrl);
+    @PostMapping("/updateImg")
+    public Result<String> updateImg(@RequestBody UpdateImg updateImg) {
+        userService.updateImg(updateImg.getImgUrl());
         return Result.success();
+    }
+
+    @GetMapping("/userSpace")
+    public Result<UserSpaceVO> getUserSpace() {
+        return userService.userSpace();
     }
 
 

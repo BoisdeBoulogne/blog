@@ -15,7 +15,7 @@ public interface UserMapper {
     User login(UserLoginDTO userLogin);
 
     @Select("select *from user where id = #{id}")
-    User getById(int id);
+    User getById(Long id);
 
     @Select("select id from user where nickname = #{targetUserNickname}")
     Long getByNickname(String targetUserNickname);

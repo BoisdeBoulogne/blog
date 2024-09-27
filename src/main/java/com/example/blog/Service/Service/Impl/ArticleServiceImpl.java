@@ -49,6 +49,8 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     CommentMapper commentMapper;
     @Autowired
+    FollowMapper followMapper;
+    @Autowired
     StringRedisTemplate stringRedisTemplate;
     @Override
     public Result<ArticleVo> getById(Long id) {
@@ -74,6 +76,12 @@ public class ArticleServiceImpl implements ArticleService {
         articleVo.setTags(tags);
         List<CommentVo> commentVos = commentMapper.getCommentsByArticleId(id);
         articleVo.setComments(commentVos);
+        Integer liked = likeMapper.getCount(article.getId(),userId);
+        articleVo.setLiked(liked);
+        Integer collect = collectMapper.getCount(article.getId(),userId);
+        articleVo.setCollected(collect);
+        Integer followed = followMapper.getCount(article.getId(),userId);
+        articleVo.setFollowed(followed);
         return Result.success(articleVo);
     }
 

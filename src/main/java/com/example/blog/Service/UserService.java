@@ -4,12 +4,13 @@ import com.example.blog.Pojo.Result.PageResult;
 import com.example.blog.Pojo.Result.Result;
 import com.example.blog.Pojo.dto.*;
 import com.example.blog.Pojo.vo.ArticleVoForPre;
+import com.example.blog.Pojo.vo.UserSpaceVO;
 import com.example.blog.Pojo.vo.UserVo;
 
 import java.util.List;
 
 public interface UserService {
-    Result<String> login(UserLoginDTO userLogin);
+    Result<LoginReturnDTO> login(UserLoginDTO userLogin);
 
     Result<String> follow(Long targetUserId);
 
@@ -38,9 +39,11 @@ public interface UserService {
 
     Result<String> signIn(UserSignInDTO userSignInDTO);
 
-    Result<String> loginByPhoneNumber(UserLoginByPhoneNumberDTO userLoginByPhoneNumberDTO);
+    Result<LoginReturnDTO> loginByPhoneNumber(UserLoginByPhoneNumberDTO userLoginByPhoneNumberDTO);
 
     Result<String> resetPassword(UserResetPassword userResetPassword);
 
     void updateImg(String imgUrl);
+
+    Result<UserSpaceVO> userSpace();
 }

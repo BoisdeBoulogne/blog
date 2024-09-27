@@ -22,4 +22,7 @@ public interface CollectMapper {
     void delete(Long userId, Long articleId);
     @Select("select count(*) from collect where article_id = #{articleId} and user_id = #{userId}")
     int getCount(Long userId, Long articleId);
+
+    @Select("select count(*) from collect where user_id = #{userId}")
+    Integer getCountByUserId(Long userId);
 }
