@@ -107,7 +107,6 @@ public class UserController {
     //新增评论 文档完成
     @PostMapping("/comment")
     public Result<String> comment(@RequestBody CommentDTO commentDTO) {
-        ThreadInfo.setThread(2L);
         userService.comment(commentDTO);
         return Result.success();
     }

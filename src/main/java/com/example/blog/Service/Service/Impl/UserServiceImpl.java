@@ -113,6 +113,7 @@ public class UserServiceImpl implements UserService {
         loginReturnDTO.setPhoneNumber(user.getPhoneNumber());
         loginReturnDTO.setAvatarUrl(user.getAvatarUrl());
         result.setData(loginReturnDTO);
+        result.setCode(1);
         return result;
     }
 
@@ -140,6 +141,8 @@ public class UserServiceImpl implements UserService {
         loginReturnDTO.setAvatarUrl(user.getAvatarUrl());
         loginReturnDTO.setUserName(user.getNickname());
         result.setData(loginReturnDTO);
+
+        result.setCode(1);
         return result;
     }
 
@@ -342,7 +345,7 @@ public class UserServiceImpl implements UserService {
 
     private String randomString(){
         Random random = new Random();
-        Integer randomInt = 100000+ random.nextInt(999999);
+        Integer randomInt = 100000+ random.nextInt(899999);
         return String.valueOf(randomInt);
     }
 
