@@ -23,7 +23,7 @@ public class HomePageController {
         return articleService.forHomePage(pageNum);
     }
 
-    @GetMapping("/keyWord")
+    @PostMapping("/keyWord")
     public Result<PageResult<ArticleVoForPre>> getHotArticlesByKeyWord(@RequestBody KeyWordDTO dto) {
         return articleService.getByKeyWord(dto);
     }

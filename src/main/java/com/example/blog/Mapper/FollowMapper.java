@@ -15,7 +15,7 @@ public interface FollowMapper {
     @Select("select follower_id from follow where leader_id = #{currId}")
     List<Long> getFansById(Long currId);
 
-    @Select("select follower_id from follow where leader_id = #{currId}")
+    @Select("select leader_id from follow where leader_id = #{currId}")
     List<Long> getLeadersById(Long currId);
 
 

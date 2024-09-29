@@ -172,6 +172,9 @@ public class UserServiceImpl implements UserService {
         if(exist == 0) {
             return Result.error("不存在的用户");
         }
+        if (targetId==shootId) {
+            return Result.error("不能关注自己");
+        }
 
         Integer count = followMapper.getCount(shootId,targetId);
         if (count > 0) {
@@ -257,7 +260,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result<PageResult<ArticleVoForPre>> getMyCollect(int pageNum) {
-
         PageHelper.startPage(pageNum,OtherConstants.pageSize);
         Long currId = ThreadInfo.getThread();
         List<Long> articleIds = collectMapper.getByUserId(currId);
@@ -305,7 +307,7 @@ public class UserServiceImpl implements UserService {
     public Result<String> like(Long articleId) {
 
         Long userId = ThreadInfo.getThread();
-        int count = likeMapper.getCount(articleId,userId);
+        int count = likeMapper.getCount(userId,articleId);
         if (count != 0){
             return Result.error("已经点赞过");
         }

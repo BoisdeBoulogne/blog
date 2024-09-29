@@ -39,7 +39,6 @@ public class UserInterceptor implements HandlerInterceptor {
             return true;  // 没有 token 或 token 解析成功，允许匿名访问
         }
 
-        // 对于其他路径，如 /article/commonTags，强制要求 JWT 验证
         if (token == null || token.isEmpty()) {
             log.warn("Unauthorized access attempt to: " + requestURI);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

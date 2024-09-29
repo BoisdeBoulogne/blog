@@ -22,8 +22,8 @@
 3. **MyBatis Mapper 配置：**  
    项目使用 `.xml` 文件映射 MyBatis 的 Mapper 类，通过动态 SQL 实现灵活查询操作。
 
-4. **Redis 缓存：**  
-   项目使用远程 Redis 服务器缓存文章详情数据，防止缓存击穿和缓存穿透问题。在经过 JMeter 压测的条件下，加入缓存后的平均响应时间不到未使用缓存时的 1/10。
+4. **Redis ：**  
+   使用Redis作为验证码的存储方式，通过设置过期时间来方便管理
 
 5. **阿里云 OSS：**  
    使用阿里云 OSS 来存储和管理图片文件，简化文件的管理和展示流程。
@@ -34,7 +34,6 @@
 - 为了确保阿里云的安全，请在 `application.yml` 文件中添加您自己的阿里云 OSS 配置属性。
 
 ## 配置文件示例（`application.yml`）
-
 
   oss:
     accessKeyId: your_aliyun_access_key
