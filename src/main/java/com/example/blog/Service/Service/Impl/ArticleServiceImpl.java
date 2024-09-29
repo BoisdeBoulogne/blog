@@ -207,9 +207,12 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Result<HomePageVo> forHomePage(int pageNum) {
+        log.info("pageNum:{}", pageNum);
         PageHelper.startPage(pageNum,5);
-        List<ArticleVoForHomePage> articleVos = new ArrayList<>();
         List<Long> articlesId = articleMapper.forHomePage();
+        log.info("articlesId:{}", articlesId);
+        List<ArticleVoForHomePage> articleVos = new ArrayList<>();
+
         Integer count = articleMapper.getAllCount();
 
         for (Long articleId : articlesId) {

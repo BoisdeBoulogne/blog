@@ -50,7 +50,7 @@
         where id = #{articleId}
     </update>
 
-    <select id="forHomePage">
+    <select id="forHomePage" resultType="java.lang.Long">
         select id from articles
         order by views + likes * 3 + collects *5
     </select>

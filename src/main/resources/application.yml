@@ -15,4 +15,9 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:Mapper/*.xml
 
